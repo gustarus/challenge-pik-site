@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
+    "string.prototype.matchall": "^3.0.1",
     "svelte-routing": "^1.2.0"
   }
 }

@@ -20,7 +20,7 @@ export default class Auth {
     try {
       const data = {email, password};
       const response = await api.post(URI_API_LOGIN, data);
-      api.defaults.headers['Authorization'] = `Bearer: ${response.data}`;
+      api.defaults.headers['Authorization'] = `Bearer ${response.data}`;
       storage.set(STORAGE_KEY_TOKEN, response.data);
       return true;
     } catch (e) { // TODO Process catch block.

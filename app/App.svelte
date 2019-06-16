@@ -6,23 +6,28 @@
   import RegisterPage from './pages/RegisterPage';
   import LoginPage from './pages/LoginPage';
   import LogoutPage from './pages/LogoutPage';
-  import {URI_DEFAULT, URI_REGISTER, URI_LOGIN, URI_LOGOUT} from './constants';
+  import PropertiesPage from './pages/PropertiesPage';
+  import PropertyPage from './pages/PropertyPage';
+  import {URI_DEFAULT, URI_REGISTER, URI_LOGIN, URI_LOGOUT, URI_PROPERTY, URI_PROPERTIES} from './constants';
 
   export let url = '';
 </script>
 
-<Router url="{url}">
+<Router url={url}>
   <nav>
-    <Link to="{URI_DEFAULT}">Default</Link>
-    <Link to="{URI_REGISTER}">Register</Link>
-    <Link to="{URI_LOGIN}">Login</Link>
-    <Link to="{URI_LOGOUT}">Logout</Link>
+    <Link to={URI_DEFAULT}>Default</Link>
+    <Link to={URI_REGISTER}>Register</Link>
+    <Link to={URI_LOGIN}>Login</Link>
+    <Link to={URI_LOGOUT}>Logout</Link>
   </nav>
   <div>
-    <PublicRoute path="{URI_REGISTER}" component="{RegisterPage}" />
-    <PublicRoute path="{URI_LOGIN}" component="{LoginPage}" />
-    <PrivateRoute path="{URI_LOGOUT}" component="{LogoutPage}" />
+    <PublicRoute path={URI_REGISTER} component={RegisterPage} />
+    <PublicRoute path={URI_LOGIN} component={LoginPage} />
+    <PrivateRoute path={URI_LOGOUT} component={LogoutPage} />
 
-    <PrivateRoute path="{URI_DEFAULT}" component="{DefaultPage}" />
+    <PrivateRoute path={URI_PROPERTIES} component={PropertiesPage} />
+    <PrivateRoute path={URI_PROPERTY} component={PropertyPage} />
+
+    <PrivateRoute path={URI_DEFAULT} component={DefaultPage} />
   </div>
 </Router>
