@@ -12,7 +12,10 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.mjs', '.js', '.svelte']
+    extensions: ['.mjs', '.js', '.svelte'],
+    alias: {
+      '@app': path.resolve(__dirname, '..', 'app'),
+    },
   },
 
   output: {
