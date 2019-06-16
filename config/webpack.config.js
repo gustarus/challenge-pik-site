@@ -8,7 +8,7 @@ const prod = mode === 'production';
 
 module.exports = {
   entry: {
-    app: [path.join(__dirname, 'app', 'index.js')]
+    app: [path.join(__dirname, '..', 'app', 'index.js')]
   },
 
   resolve: {
@@ -16,16 +16,16 @@ module.exports = {
   },
 
   output: {
-    path: path.join(__dirname, 'public', 'assets'),
+    path: path.join(__dirname, '..', 'public'),
     filename: '[name].[hash].js',
-    chunkFilename: '[name].[id].[hash].js'
+    chunkFilename: '[name].[id].[hash].js',
+    publicPath: '/',
   },
 
   module: {
     rules: [
       {
         test: /\.svelte$/,
-        exclude: /node_modules/,
         use: {
           loader: 'svelte-loader',
           options: {
@@ -62,7 +62,7 @@ module.exports = {
     new HtmlPlugin({
       title: variables.title,
       description: variables.description,
-      filename: path.join('..', 'index.html'),
+      filename: path.join('index.html'),
       template: path.join('app', 'index.jade'),
     }),
   ],
