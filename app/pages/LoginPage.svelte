@@ -4,11 +4,11 @@
 
   function onSubmit(e) {
     e.preventDefault();
-    const username = e.target.elements.username.value;
+    const email = e.target.elements.email.value;
     const password = e.target.elements.password.value;
 
     const trigger = (success) => logged.update(() => success);
-    auth.login(username, password).then(trigger);
+    auth.login(email, password).then(trigger);
   }
 </script>
 
@@ -21,7 +21,11 @@
 <h1>Login page</h1>
 
 <form on:submit={onSubmit}>
-  <input type="text" name="username" />
+  Email
+  <input type="text" name="email" />
+
+  Password
   <input type="password" name="password" />
+
   <button type="submit">Login</button>
 </form>
