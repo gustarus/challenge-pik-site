@@ -1,6 +1,6 @@
 import matchAll from 'string.prototype.matchall';
 
-export class Uri {
+export default class Uri {
 
   /**
    * Parse url with path template to receive path variables.

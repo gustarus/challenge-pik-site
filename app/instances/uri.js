@@ -1,3 +1,3 @@
-import {Uri} from '../models/Uri';
+import Uri from '../models/Uri';
 
 export default new Uri;
