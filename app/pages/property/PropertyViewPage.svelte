@@ -1,8 +1,9 @@
 <script>
+  import { Link } from 'svelte-routing';
   import uri from './../../instances/uri';
   import api from './../../instances/api';
   import PropertyView from './partial/PropertyView';
-  import { URI_PROPERTY_VIEW, URI_API_PROPERTY, URI_API_PROPERTY_PICTURES_SEARCH } from './../../constants';
+  import { URI_PROPERTY_VIEW, URI_API_PROPERTY, URI_API_PROPERTY_PICTURES_SEARCH, URI_ROOM_INDEX } from './../../constants';
 
   // getting path params
   const params = uri.parse(window.location.pathname, URI_PROPERTY_VIEW); // TODO Extract this to route logic.
@@ -29,6 +30,7 @@
 </style>
 
 <h1>Property view page</h1>
+<Link to={uri.compile(URI_ROOM_INDEX, { property: id })}>Rooms</Link>
 
 {#if data.id}
   <PropertyView data={data} pictures={pictures} />

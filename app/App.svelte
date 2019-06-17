@@ -11,6 +11,11 @@
   import PropertyUpdatePage from './pages/property/PropertyUpdatePage.svelte';
   import PropertyDeletePage from './pages/property/PropertyDeletePage.svelte';
   import PropertyViewPage from './pages/property/PropertyViewPage.svelte';
+  import RoomIndexPage from './pages/room/RoomIndexPage.svelte';
+  import RoomCreatePage from './pages/room/RoomCreatePage.svelte';
+  import RoomUpdatePage from './pages/room/RoomUpdatePage.svelte';
+  import RoomDeletePage from './pages/room/RoomDeletePage.svelte';
+  import RoomViewPage from './pages/room/RoomViewPage.svelte';
   import {
     URI_DEFAULT,
     URI_REGISTER,
@@ -21,6 +26,11 @@
     URI_PROPERTY_CREATE,
     URI_PROPERTY_UPDATE,
     URI_PROPERTY_DELETE,
+    URI_ROOM_VIEW,
+    URI_ROOM_INDEX,
+    URI_ROOM_CREATE,
+    URI_ROOM_UPDATE,
+    URI_ROOM_DELETE,
   } from './constants';
 
   export let url = '';
@@ -43,6 +53,12 @@
     <PrivateRoute path={URI_PROPERTY_UPDATE} component={PropertyUpdatePage} />
     <PrivateRoute path={URI_PROPERTY_VIEW} component={PropertyViewPage} />
     <PrivateRoute path={URI_PROPERTY_DELETE} component={PropertyDeletePage} />
+
+    <PrivateRoute path={URI_ROOM_INDEX} component={RoomIndexPage} />
+    <PrivateRoute path={URI_ROOM_CREATE} component={RoomCreatePage} />
+    <PrivateRoute path={URI_ROOM_UPDATE} component={RoomUpdatePage} />
+    <PrivateRoute path={URI_ROOM_VIEW} component={RoomViewPage} />
+    <PrivateRoute path={URI_ROOM_DELETE} component={RoomDeletePage} />
 
     <PrivateRoute path={URI_DEFAULT} component={DefaultHomePage} />
   </div>

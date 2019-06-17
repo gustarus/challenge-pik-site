@@ -23,16 +23,18 @@ export class Uri {
         const names = [];
 
         // search for all names
-        const variablesMatches = matchAll(pathTemplate, /:(\w+)/);
+        const namesRegexp = /:(\w+)/g;
+        const variablesMatches = matchAll(pathTemplate, namesRegexp);
         for (const variableMatch of variablesMatches) {
           names.push(variableMatch[1]);
         }
 
         // search for all values
-        const valuesMatches = matchAll(path, pathTemplate.replace(/:(\w+)/, '([^/]+)'));
-        for (const valueMatch of valuesMatches) {
+        const valuesRegexp = new RegExp(pathTemplate.replace(/:(\w+)/g, '([^/]+)'));
+        const valuesMatches = path.match(valuesRegexp);
+        for (let i = 1; valuesMatches[i]; i++) {
           const name = names.shift();
-          params[name] = valueMatch[1];
+          params[name] = valuesMatches[i];
         }
       }
     }
