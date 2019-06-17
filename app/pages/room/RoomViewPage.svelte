@@ -1,4 +1,5 @@
 <script>
+  import { Link } from 'svelte-routing';
   import uri from './../../instances/uri';
   import api from './../../instances/api';
   import RoomView from './partial/RoomView';
@@ -10,6 +11,7 @@
     URI_ROOM_VIEW,
     URI_API_ROOM,
     URI_API_ROOM_PICTURES_SEARCH,
+    URI_ROOM_DELETE,
   } from './../../constants';
 
   // getting path params
@@ -44,6 +46,7 @@
 </style>
 
 <h1>Property view page</h1>
+<Link to={uri.compile(URI_ROOM_DELETE, { property: propertyId, id })}>Delete</Link>
 
 {#if data.id}
   <RoomView property={property} data={data} pictures={pictures} />

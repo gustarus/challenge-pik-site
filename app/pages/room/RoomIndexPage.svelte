@@ -22,7 +22,7 @@
     const query = { property_id: property.id };
     return api.get(URI_API_ROOMS_SEARCH, query)
   }).then((response) => {
-    data = [...response.data];
+    data = [...Object.values(response.data)];
   });
 </script>
 
@@ -43,7 +43,7 @@
     {#each data as item}
       <li>
         <a href={uri.compile(URI_ROOM_VIEW, { property: propertyId, id: item.id })}>
-          {item.title}, {item.address}
+          {item.title}
         </a>
       </li>
     {/each}

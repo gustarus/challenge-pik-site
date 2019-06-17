@@ -1,5 +1,6 @@
 <script>
   import uri from './../../instances/uri';
+  import api from './../../instances/api';
   import { navigate } from 'svelte-routing';
   import { URI_PROPERTY_DELETE, URI_PROPERTY_INDEX, URI_API_PROPERTY } from './../../constants';
 
