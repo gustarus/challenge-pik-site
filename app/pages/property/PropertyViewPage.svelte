@@ -29,4 +29,9 @@
 </style>
 
 <h1>Property view page</h1>
-<PropertyView data={data} pictures={pictures} />
+
+{#if data.id}
+  <PropertyView data={data} pictures={pictures} />
+{:else}
+  Loading...
+{/if}

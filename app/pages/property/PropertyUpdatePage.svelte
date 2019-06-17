@@ -2,7 +2,7 @@
   import uri from './../../instances/uri';
   import api from './../../instances/api';
   import PropertyForm from './partial/PropertyForm';
-  import { URI_PROPERTY_UPDATE, URI_API_PROPERTY } from './../../constants';
+  import { URI_PROPERTY_UPDATE, URI_API_PROPERTY, URI_API_PROPERTY_PICTURES_SEARCH } from './../../constants';
 
   // getting path params
   const params = uri.parse(window.location.pathname, URI_PROPERTY_UPDATE); // TODO Extract this to route logic.
@@ -10,9 +10,15 @@
 
   // loading element
   $: data = {};
+  $: pictures = [];
   const uriToPropertyApi = uri.compile(URI_API_PROPERTY, { id });
   api.get(uriToPropertyApi).then((response) => {
-    $data = response.data;
+    data = response.data;
+
+    const query = { property_id: data.id };
+    return api.get(URI_API_PROPERTY_PICTURES_SEARCH, query);
+  }).then((response) => {
+    pictures = Object.values(response.data);
   });
 </script>
 
@@ -23,4 +29,9 @@
 </style>
 
 <h1>Property update page</h1>
-<PropertyForm data={$data} />
+
+{#if data.id}
+  <PropertyForm data={data} pictures={pictures} />
+{:else}
+  Loading...
+{/if}

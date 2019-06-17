@@ -20,6 +20,7 @@ export const URI_API_PROPERTIES = '/muffin/property';
 export const URI_API_PROPERTY = '/muffin/property/:id';
 export const URI_API_PROPERTY_PICTURES = '/muffin/property-picture';
 export const URI_API_PROPERTY_PICTURES_SEARCH = '/muffin/property-picture/search';
+export const URI_API_PROPERTY_PICTURE = '/muffin/property-picture/:id';
 export const URI_API_PICTURES = '/muffin/picture';
 export const URI_API_PICTURE = '/muffin/picture/:id';
 

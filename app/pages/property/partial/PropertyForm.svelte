@@ -4,12 +4,15 @@
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
   import {
+    API_URL,
+    URI_API_PICTURE,
     URI_API_PROPERTIES,
     URI_API_PROPERTY,
     HTTP_STATUS_VALIDATION_ERROR,
     URI_PROPERTY_VIEW,
     URI_API_PICTURES,
     URI_API_PROPERTY_PICTURES,
+    URI_API_PROPERTY_PICTURE,
   } from './../../../constants';
 
   export let data = {
@@ -24,7 +27,13 @@
 
   export let pictures = [];
 
-  const uploads = [];
+  $: display = pictures;
+
+  $: uploads = [];
+
+  $: removals = [];
+
+  $: previews = [];
 
   // TODO Get properties list via api.
 
@@ -51,6 +60,11 @@
         await api.post(URI_API_PROPERTY_PICTURES, relationData);
       }
 
+      // delete unused pictures
+      for (const picture of removals) {
+        await api.delete(uri.compile(URI_API_PROPERTY_PICTURE, { id: picture.id }));
+      }
+
       navigate(uri.compile(URI_PROPERTY_VIEW, { id: response.data.id }));
     } catch(e) {
       let message = e.response.status === HTTP_STATUS_VALIDATION_ERROR
@@ -71,14 +85,31 @@
 
       const reader = new FileReader();
       reader.onload = (e) => {
-        const span = document.createElement('div');
-        span.classList.add('picture'); // TODO Check class list availability.
-        span.innerHTML = `<img src="${e.target.result}" title="${escape(file.name)}"/>`;
-        document.getElementById('pictures').insertBefore(span, null);
+        previews[i] = e.target.result;
       };
 
       reader.readAsDataURL(file);
     }
+  }
+
+  async function onUnselect(e) {
+    e.preventDefault();
+    const index = parseInt(e.target.dataset.index, 10);
+
+    previews.splice(index, 1); // TODO Normal functionality to remove item.
+    previews = [...previews];
+
+    uploads.splice(index, 1); // TODO Normal functionality to remove item.
+    uploads = [...uploads];
+  }
+
+  async function onRemove(e) {
+    e.preventDefault();
+    const index = parseInt(e.target.dataset.index, 10);
+    const picture = display[index];
+    display.splice(index, 1); // TODO Normal functionality to remove item.
+    display = [...display];
+    removals.push(picture);
   }
 </script>
 
@@ -114,6 +145,20 @@
   <input bind:value={data.price} type="number" id="price" name="price" required />
 
   <div id="pictures">
+    {#each previews as preview, i}
+      <div class="picture">
+        <a href="#" on:click={onUnselect} data-index={i}>Delete</a>
+        <img src={preview} />
+      </div>
+    {/each}
+
+    {#each display as picture, i}
+      <div class="picture">
+        <a href="#" on:click={onRemove} data-index={i}>Delete</a>
+        <img src={API_URL}{uri.compile(URI_API_PICTURE, { id: picture.file_id })} />
+      </div>
+    {/each}
+
     <div class="picture picture-placeholder">
       <input type="file" accept="image/*" capture="camera" on:change={onCapture} />
     </div>
