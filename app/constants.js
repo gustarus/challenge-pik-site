@@ -2,6 +2,7 @@ export const API_URL = 'http://localhost:3000';
 export const API_TIMEOUT = 5000;
 
 export const STORAGE_KEY = 'ChallengePikSite';
+export const STORAGE_KEY_PRIMARY = 'id';
 export const STORAGE_KEY_TOKEN = 'token';
 
 export const URI_DEFAULT = '/';
@@ -24,6 +25,7 @@ export const URI_API_REGISTER = '/muffin/auth/register';
 export const URI_API_PICTURES = '/muffin/picture';
 export const URI_API_PICTURE = '/muffin/picture/:id';
 export const URI_API_PROPERTIES = '/muffin/property';
+export const URI_API_PROPERTIES_SEARCH = '/muffin/property/search';
 export const URI_API_PROPERTY = '/muffin/property/:id';
 export const URI_API_PROPERTY_PICTURES = '/muffin/property-picture';
 export const URI_API_PROPERTY_PICTURES_SEARCH = '/muffin/property-picture/search';
