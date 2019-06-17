@@ -1,10 +1,10 @@
 import axios from 'axios';
 import storage from './storage';
-import {STORAGE_KEY_TOKEN} from '../constants';
+import { STORAGE_KEY_TOKEN, API_URL, API_TIMEOUT } from '../constants';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
-  timeout: 10000,
+  baseURL: API_URL,
+  timeout: API_TIMEOUT,
 });
 
 const token = storage.get(STORAGE_KEY_TOKEN);
