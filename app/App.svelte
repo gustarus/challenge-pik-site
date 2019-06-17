@@ -16,6 +16,7 @@
   import RoomUpdatePage from './pages/room/RoomUpdatePage.svelte';
   import RoomDeletePage from './pages/room/RoomDeletePage.svelte';
   import RoomViewPage from './pages/room/RoomViewPage.svelte';
+  import Navigation from './partials/Navigation.svelte';
   import {
     URI_DEFAULT,
     URI_REGISTER,
@@ -37,12 +38,8 @@
 </script>
 
 <Router url={url}>
-  <nav>
-    <Link to={URI_DEFAULT}>Default</Link>
-    <Link to={URI_REGISTER}>Register</Link>
-    <Link to={URI_LOGIN}>Login</Link>
-    <Link to={URI_LOGOUT}>Logout</Link>
-  </nav>
+  <Navigation />
+
   <div>
     <PublicRoute path={URI_REGISTER} component={RegisterAuthPage} />
     <PublicRoute path={URI_LOGIN} component={LoginAuthPage} />
