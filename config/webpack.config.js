@@ -1,10 +1,13 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const variables = require(path.join(__dirname, 'template.config.js'));
 
 const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
+
+const publicPath = path.join(__dirname, '..', 'public');
 
 module.exports = {
   entry: {
@@ -19,7 +22,7 @@ module.exports = {
   },
 
   output: {
-    path: path.join(__dirname, '..', 'public'),
+    path: publicPath,
     filename: '[name].[hash].js',
     chunkFilename: '[name].[id].[hash].js',
     publicPath: '/',
@@ -68,6 +71,13 @@ module.exports = {
       filename: path.join('index.html'),
       template: path.join('app', 'index.jade'),
     }),
+
+    new CopyPlugin([
+      { from: path.join(__dirname, '..', 'app', 'manifest.json'), to: path.join(publicPath, 'manifest.json') },
+      { from: path.join(__dirname, '..', 'app', 'service-worker.js'), to: path.join(publicPath, 'service-worker.js') },
+      { from: path.join(__dirname, '..', 'app', 'images', 'icons', 'logo-192.png'), to: path.join(publicPath, 'logo-192.png') },
+      { from: path.join(__dirname, '..', 'app', 'images', 'icons', 'logo-512.png'), to: path.join(publicPath, 'logo-512.png') },
+    ]),
   ],
 
   devtool: prod ? false : 'source-map'

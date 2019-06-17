@@ -2,6 +2,8 @@
   import { Router, Link, Route } from 'svelte-routing';
   import PrivateRoute from './components/PrivateRoute';
   import PublicRoute from './components/PublicRoute';
+  import InstallPrompt from './components/InstallPrompt.svelte';
+  import ServiceWorker from './components/ServiceWorker.svelte';
   import DefaultHomePage from './pages/home/DefaultHomePage';
   import RegisterAuthPage from './pages/auth/RegisterAuthPage';
   import LoginAuthPage from './pages/auth/LoginAuthPage';
@@ -38,6 +40,8 @@
 </script>
 
 <Router url={url}>
+  <ServiceWorker />
+  <InstallPrompt />
   <Navigation />
 
   <div>

@@ -160,14 +160,14 @@
   <div id="pictures">
     {#each previews as preview, i}
       <div class="picture">
-        <a href="#" on:click={onUnselect} data-index={i}>Delete</a>
+        <a href="/" on:click={onUnselect} data-index={i}>Delete</a>
         <img src={preview} />
       </div>
     {/each}
 
     {#each display as picture, i}
       <div class="picture">
-        <a href="#" on:click={onRemove} data-index={i}>Delete</a>
+        <a href="/" on:click={onRemove} data-index={i}>Delete</a>
         <img src={API_URL}{uri.compile(URI_API_PICTURE, { id: picture.file_id })} />
       </div>
     {/each}
