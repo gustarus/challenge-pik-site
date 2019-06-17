@@ -1,5 +1,6 @@
 import storage from './../instances/storage';
 import api from './../instances/api';
+import notify from './../instances/notify';
 import { STORAGE_KEY_PRIMARY, STORAGE_KEY_TOKEN, URI_API_LOGIN, URI_API_REGISTER } from '../constants';
 
 export default class Auth {
@@ -11,7 +12,7 @@ export default class Auth {
       return response.data;
     } catch (e) { // TODO Process catch block.
       const message = e.response && e.response.data && e.response.data.message || e.message;
-      alert(message);
+      notify.show(message);
       return false;
     }
   }
@@ -26,7 +27,7 @@ export default class Auth {
       return true;
     } catch (e) { // TODO Process catch block.
       const message = e.response && e.response.data && e.response.data.message || e.message;
-      alert(message);
+      notify.show(message);
       return false;
     }
   }

@@ -3,6 +3,7 @@
   import { navigate } from 'svelte-routing';
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
+  import notify from './../../../instances/notify';
   import {
     API_URL,
     URI_API_PICTURE,
@@ -78,7 +79,7 @@
     } catch(e) {
       let message = e.response.status === HTTP_STATUS_VALIDATION_ERROR
         ? e.response.data[0].message : e.message;
-      alert(message); // TODO Pretty processing for errors.
+      notify.show(message);
     }
   }
 
