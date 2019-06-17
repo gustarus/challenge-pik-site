@@ -41,6 +41,7 @@
   $: previews = [];
 
   // TODO Get properties list via api.
+  // TODO Extract pictures logic to the separate component.
 
   async function onSubmit(e) {
     e.preventDefault();
