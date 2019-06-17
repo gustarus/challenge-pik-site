@@ -7,6 +7,9 @@ export const STORAGE_KEY_TOKEN = 'token';
 
 export const HTTP_STATUS_VALIDATION_ERROR = 422;
 
+export const IMAGE_MAX_WIDTH = 1200;
+export const IMAGE_MAX_HEIGHT = IMAGE_MAX_WIDTH;
+
 export const URI_DEFAULT = '/';
 export const URI_REGISTER = '/register';
 export const URI_LOGIN = '/login';

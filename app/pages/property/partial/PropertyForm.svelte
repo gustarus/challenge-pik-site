@@ -4,6 +4,8 @@
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
   import notify from './../../../instances/notify';
+  import resizePictureFromDataUri from './../../../helpers/resizePictureFromDataUri';
+  import convertDataUriToBlob from './../../../helpers/convertDataUriToBlob';
   import {
     API_URL,
     URI_API_PICTURE,
@@ -14,6 +16,8 @@
     URI_API_PICTURES,
     URI_API_PROPERTY_PICTURES,
     URI_API_PROPERTY_PICTURE,
+    IMAGE_MAX_WIDTH,
+    IMAGE_MAX_HEIGHT,
   } from './../../../constants';
 
   export let data = {
@@ -50,10 +54,13 @@
       const response = await processor(uriToPropertyApi, data);
 
       // save and bind the pictures
-      for (const file of uploads) {
+      for (const i in uploads) {
+        const dataUri = resizePictureFromDataUri(previews[i], IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT);
+        const fileResized = convertDataUriToBlob(dataUri);
+
         // upload the file
         const data = new FormData();
-        data.append('file', file);
+        data.append('file', fileResized);
         const fileResponse = await api.post(URI_API_PICTURES, data);
 
         // bind the file
