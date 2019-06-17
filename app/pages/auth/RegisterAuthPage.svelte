@@ -2,17 +2,25 @@
   import auth from '../../instances/auth';
   import { logged } from '../../stores/logged';
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
     const email = e.target.elements.email.value;
     const password = e.target.elements.password.value;
 
-    const trigger = (success) => logged.update(() => success);
-    auth.register(email, password).then((success) => {
-      if (success) {
-        auth.login(email, password).then(trigger);
-      }
-    });
+    // register user
+    const registerSuccess = await auth.register(email, password);
+    if (!registerSuccess) {
+      return;
+    }
+
+    // login user
+    const loginSuccess = await auth.login(email, password);
+    if (!loginSuccess) {
+      return;
+    }
+
+    // update store
+    logged.update(() => true)
   }
 </script>
 
