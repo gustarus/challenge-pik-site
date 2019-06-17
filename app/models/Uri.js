@@ -53,4 +53,17 @@ export class Uri {
 
     return params;
   }
+
+  compile(template, params = {}, query = {}) {
+    let result = template;
+    for (const name in params) {
+      if (params.hasOwnProperty(name)) {
+        result = result.replace(`:${name}`, params[name]);
+      }
+    }
+
+    // TODO Query string compilation.
+
+    return result;
+  }
 }

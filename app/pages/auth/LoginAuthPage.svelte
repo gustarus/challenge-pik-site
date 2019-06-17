@@ -1,6 +1,6 @@
 <script>
-  import { logged } from './../stores/logged';
-  import auth from './../instances/auth';
+  import { logged } from '../../stores/logged';
+  import auth from '../../instances/auth';
 
   function onSubmit(e) {
     e.preventDefault();
