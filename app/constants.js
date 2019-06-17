@@ -5,6 +5,8 @@ export const STORAGE_KEY = 'ChallengePikSite';
 export const STORAGE_KEY_PRIMARY = 'id';
 export const STORAGE_KEY_TOKEN = 'token';
 
+export const HTTP_STATUS_VALIDATION_ERROR = 422;
+
 export const URI_DEFAULT = '/';
 export const URI_REGISTER = '/register';
 export const URI_LOGIN = '/login';
@@ -36,5 +38,3 @@ export const URI_API_ROOM = '/muffin/property-room/:id';
 export const URI_API_ROOM_PICTURES = '/muffin/property-room-picture';
 export const URI_API_ROOM_PICTURES_SEARCH = '/muffin/property-room-picture/search';
 export const URI_API_ROOM_PICTURE = '/muffin/property-room-picture/:id';
-
-export const HTTP_STATUS_VALIDATION_ERROR = 422;
