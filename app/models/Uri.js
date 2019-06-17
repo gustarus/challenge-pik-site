@@ -56,15 +56,21 @@ export default class Uri {
     return params;
   }
 
-  compile(template, params = {}, query = {}) {
-    let result = template;
-    for (const name in params) {
-      if (params.hasOwnProperty(name)) {
-        result = result.replace(`:${name}`, params[name]);
+  /**
+   * Compile path uri.
+   * For example, if pathTemplate = '/unit/:id' and pathParams = { id: 1 }
+   *  --> result will be '/unit/1'.
+   * @param pathTemplate
+   * @param pathParams
+   * @returns {*}
+   */
+  compile(pathTemplate, pathParams = {}) {
+    let result = pathTemplate;
+    for (const name in pathParams) {
+      if (pathParams.hasOwnProperty(name)) {
+        result = result.replace(`:${name}`, pathParams[name]);
       }
     }
-
-    // TODO Query string compilation.
 
     return result;
   }
