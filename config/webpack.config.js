@@ -1,6 +1,7 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const svelteGlobalCSS = require('svelte-preprocess-css-global');
 const path = require('path');
 const variables = require(path.join(__dirname, 'template.config.js'));
 
@@ -36,7 +37,10 @@ module.exports = {
           loader: 'svelte-loader',
           options: {
             emitCss: true,
-            hotReload: true
+            hotReload: true,
+            preprocess: {
+              style: svelteGlobalCSS()
+            }
           }
         }
       },
