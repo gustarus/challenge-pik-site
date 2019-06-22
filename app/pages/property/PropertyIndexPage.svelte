@@ -2,6 +2,7 @@
   import auth from './../../instances/auth';
   import api from './../../instances/api';
   import uri from './../../instances/uri';
+  import handleApiError from './../../helpers/handleApiError';
   import { title } from './../../stores/meta';
   import Link from './../../components/Link.svelte';
   import LoadingContent from './../../components/LoadingContent';
@@ -19,7 +20,7 @@
   api.get(URI_API_PROPERTIES_SEARCH, { params: { created_by: auth.primary } }).then((response) => {
     data = Object.values(response.data);
     loading = false;
-  });
+  }).catch(handleApiError);
 </script>
 
 <style>

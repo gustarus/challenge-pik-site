@@ -5,6 +5,7 @@ export const STORAGE_KEY = 'ChallengePikSite';
 export const STORAGE_KEY_PRIMARY = 'id';
 export const STORAGE_KEY_TOKEN = 'token';
 
+export const HTTP_STATUS_PROTECTED = 401;
 export const HTTP_STATUS_VALIDATION_ERROR = 422;
 
 export const PREVIEW_MAX_SIZE = 500;
