@@ -6,6 +6,8 @@
   import BootstrapTheme from './themes/BootstrapTheme.svelte';
   import OpenIconicTheme from './themes/OpenIconicTheme.svelte';
   import InstallPrompt from './components/InstallPrompt.svelte';
+  import ContentTitle from './components/ContentTitle.svelte';
+  import DynamicMeta from './components/DynamicMeta.svelte';
   import ServiceWorker from './components/ServiceWorker.svelte';
   import DefaultHomePage from './pages/home/DefaultHomePage';
   import RegisterAuthPage from './pages/auth/RegisterAuthPage';
@@ -40,19 +42,21 @@
   } from './constants';
 
   export let url = '';
+
+
 </script>
 
 <ServiceWorker>
-  <ResetStylesTheme>
-    <BootstrapTheme>
-      <OpenIconicTheme>
-        <div class="container">
-          <Router url={url}>
-            <Navigation />
+  <DynamicMeta>
+    <ResetStylesTheme>
+      <BootstrapTheme>
+        <OpenIconicTheme>
+          <div class="container">
+            <Router url={url}>
+              <InstallPrompt />
+              <Navigation />
+              <ContentTitle />
 
-            <InstallPrompt />
-
-            <div>
               <PublicRoute path={URI_REGISTER} component={RegisterAuthPage} />
               <PublicRoute path={URI_LOGIN} component={LoginAuthPage} />
               <PrivateRoute path={URI_LOGOUT} component={LogoutAuthPage} />
@@ -70,10 +74,10 @@
               <PrivateRoute path={URI_ROOM_DELETE} component={RoomDeletePage} />
 
               <PrivateRoute path={URI_DEFAULT} component={DefaultHomePage} />
-            </div>
-          </Router>
-        </div>
-      </OpenIconicTheme>
-    </BootstrapTheme>
-  </ResetStylesTheme>
+            </Router>
+          </div>
+        </OpenIconicTheme>
+      </BootstrapTheme>
+    </ResetStylesTheme>
+  </DynamicMeta>
 </ServiceWorker>

@@ -1,31 +1,22 @@
 <script>
   import { logged } from '../../stores/logged';
+  import { title } from '../../stores/meta';
   import auth from '../../instances/auth';
+  import CredentialsForm from './parial/CredentialsForm.svelte';
 
-  function onSubmit(e) {
+  $title = 'Sign in with existed account';
+
+  export let email = '';
+  export let password = '';
+
+  let loading = false;
+  async function onSubmit(e) {
     e.preventDefault();
-    const email = e.target.elements.email.value;
-    const password = e.target.elements.password.value;
-
+    loading = true;
     const trigger = (success) => logged.update(() => success);
-    auth.login(email, password).then(trigger);
+    await auth.login(email, password).then(trigger);
+    loading = false;
   }
 </script>
 
-<style>
-	h1 {
-		color: purple;
-	}
-</style>
-
-<h1>Login page</h1>
-
-<form on:submit={onSubmit}>
-  Email
-  <input type="text" name="email" />
-
-  Password
-  <input type="password" name="password" />
-
-  <button type="submit">Login</button>
-</form>
+<CredentialsForm bind:email bind:password on:submit={onSubmit} loading={loading} />

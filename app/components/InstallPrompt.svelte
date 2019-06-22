@@ -17,8 +17,13 @@
   });
 </script>
 
-<div style="display: none;" bind:this={container}>
-  <br/>
+<style>
+  .component {
+    margin-top: 1rem;
+  }
+</style>
+
+<div style="display: none;" class="component" bind:this={container}>
   <div class="alert alert-info fade show" role="alert">
     <strong>Install our app to the home screen.</strong> <a href="#" bind:this={install}>Click the link to install the app</a>
   </div>

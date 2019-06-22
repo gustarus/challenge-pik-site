@@ -26,12 +26,16 @@
 </script>
 
 <style>
+  .component {
+    margin-bottom: 1rem;
+  }
+
   .brand {
     border-radius: 2px;
   }
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="component navbar navbar-expand-lg navbar-light bg-light">
   <span class="navbar-brand">
     <img src="/brand-192.png" width="30" height="30" alt="" class="brand">
   </span>
