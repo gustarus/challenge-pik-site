@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher, onMount, beforeUpdate } from 'svelte';
+  import { createEventDispatcher, onMount, beforeUpdate, onDestroy } from 'svelte';
   import uri from './../instances/uri';
   import notify from './../instances/notify';
   import handleApiError from './../helpers/handleApiError';
@@ -104,6 +104,12 @@
     }).catch((error) => {
       handleApiError(error);
     });
+  });
+
+  onDestroy(() => {
+    if (video.srcObject) {
+      video.srcObject.getTracks().forEach(track => track.stop());
+    }
   });
 </script>
 
