@@ -3,8 +3,8 @@
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
   import notify from './../../../instances/notify';
+  import handleApiError from './../../../helpers/handleApiError';
   import PicturesInput from './../../../components/PicturesInput.svelte';
-  import convertDataUriToBlob from './../../../helpers/convertDataUriToBlob';
   import {
     API_URL,
     URI_API_PICTURE,
@@ -47,14 +47,9 @@
 
       // save and bind the pictures
       for (const file of attaches) {
-        const blob = convertDataUriToBlob(file.content);
+        const fileResponse = await api.upload(URI_API_PICTURES, file.content);
 
-        // upload the file
-        const data = new FormData();
-        data.append('file', blob);
-        const fileResponse = await api.post(URI_API_PICTURES, data);
-
-        // bind the file
+        // connect the file
         const relationData = { property_id: response.data.id, file_id: fileResponse.data.id };
         await api.post(URI_API_PROPERTY_PICTURES, relationData);
       }
@@ -66,9 +61,7 @@
 
       navigate(uri.compile(URI_PROPERTY_VIEW, { id: response.data.id }));
     } catch(e) {
-      let message = e.response && e.response.status && e.response.status === HTTP_STATUS_VALIDATION_ERROR
-        ? e.response.data[0].message : e.message;
-      notify.show(message);
+      handleApiError(e);
     }
   }
 </script>
