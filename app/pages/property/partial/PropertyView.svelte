@@ -50,10 +50,8 @@
 
 <div class="jumbotron jumbotron-fluid component">
   <div class="container">
-    <h1 class="display-4">
-      {data.title}
-      <br/><small>{data.square} meters per {data.price}₽ month</small>
-    </h1>
+    <h4>[{data.type}] {data.square} meters per {data.price}₽ month</h4>
+    <h1 class="display-4">{data.title}</h1>
 
     <p class="lead">
       {#if data.description}

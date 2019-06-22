@@ -12,6 +12,7 @@
     URI_API_PROPERTIES,
     URI_API_PROPERTY,
     URI_PROPERTY_VIEW,
+    URI_PROPERTY_INDEX,
     URI_API_PICTURES,
     URI_API_PROPERTY_PICTURES,
     URI_API_PROPERTY_PICTURE,
@@ -146,5 +147,9 @@
     {/if}
   </ProcessButton>
 
-  <Link to={uri.compile(URI_PROPERTY_VIEW, { id: data.id })} getProps={getCancelLinkProps}>Cancel</Link>
+  {#if data.id}
+    <Link to={uri.compile(URI_PROPERTY_VIEW, { id: data.id })} getProps={getCancelLinkProps}>Cancel</Link>
+  {:else}
+    <Link to={URI_PROPERTY_INDEX} getProps={getCancelLinkProps}>Cancel</Link>
+  {/if}
 </form>

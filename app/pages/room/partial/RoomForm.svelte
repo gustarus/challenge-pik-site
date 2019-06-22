@@ -1,10 +1,11 @@
 <script>
-  import { navigate } from 'svelte-routing';
+  import { navigate, Link } from 'svelte-routing';
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
   import handleApiError from './../../../helpers/handleApiError';
   import notify from './../../../instances/notify';
   import PicturesInput from './../../../components/PicturesInput.svelte';
+  import ProcessButton from './../../../components/ProcessButton.svelte';
   import {
     API_URL,
     URI_API_PICTURE,
@@ -15,6 +16,7 @@
     URI_API_PICTURES,
     URI_API_ROOM_PICTURES,
     URI_ROOM_VIEW,
+    URI_ROOM_INDEX,
     URI_API_ROOM,
     URI_API_ROOMS,
     URI_API_ROOM_PICTURE,
@@ -34,14 +36,20 @@
 
   export let pictures = [];
 
-  let existed = [...pictures];
   let attaches = [];
   let removals = [];
 
+  let loading = false;
   async function onSubmit(e) {
     e.preventDefault();
+    if (e.target.checkValidity() === false) {
+      e.target.classList.add('was-validated');
+      return;
+    }
 
     try {
+      loading = true;
+
       // save the property room
       const uriToPropertyApi = data.id
         ? uri.compile(URI_API_ROOM, { id: data.id })
@@ -66,47 +74,66 @@
         await api.delete(uri.compile(URI_API_ROOM_PICTURE, { id: picture.id }));
       }
 
+      loading = false;
       navigate(uri.compile(URI_ROOM_VIEW, { property: property.id, id: response.data.id }));
     } catch(e) {
+      loading = false;
       handleApiError(e);
     }
   }
+
+  function getCancelLinkProps() {
+    return { class: 'btn btn-info btn-block'};
+  }
 </script>
 
-<style>
-	h1 {
-		color: purple;
-	}
-</style>
+<form on:submit={onSubmit} class="needs-validation" novalidate>
+  <div class="form-group">
+    <label for="type">Select type <sup class="text-danger">*</sup></label>
+    <select bind:value={data.type} class="form-control" required id="type">
+      <option value=""></option>
+      <option value="kitchen">Kitchen</option>
+      <option value="dinning-room">Dinning room</option>
+      <option value="living-room">Living room</option>
+      <option value="bedroom">Bedroom</option>
+      <option value="bathroom">Bathroom</option>
+      <option value="balcony">Balcony</option>
+      <option value="garage">Garage</option>
+    </select>
+    <div class="invalid-feedback">
+      Please choose a type.
+    </div>
+  </div>
 
-<div>Id: {data.id}</div>
+  <div class="form-group">
+    <label for="title">Room name <sup class="text-danger">*</sup></label>
+    <input bind:value={data.title} type="text" class="form-control" required id="title">
+    <div class="invalid-feedback">
+      Please choose a name for the room.
+    </div>
+  </div>
 
-<form on:submit={onSubmit}>
-  Select type <sup>*</sup>
-  <select name="type" bind:value={data.type} required>
-    <option value="">-- Select --</option>
-    <option value="kitchen">Kitchen</option>
-    <option value="dinning-room">Dinning room</option>
-    <option value="living-room">Living room</option>
-    <option value="bedroom">Bedroom</option>
-    <option value="bathroom">Bathroom</option>
-    <option value="balcony">Balcony</option>
-    <option value="garage">Garage</option>
-  </select>
+  <div class="form-group">
+    <label for="description">Room description</label>
+    <textarea bind:value={data.description} id="description" class="form-control"></textarea>
+  </div>
 
-  <label for="title">Title <sup>*</sup></label>
-  <input bind:value={data.title} type="text" id="title" name="title" required />
+  <div class="form-group">
+    <label for="pictures">Room pictures</label>
+    <PicturesInput bind:existed={pictures} bind:attached={attaches} bind:removed={removals} id="pictures" />
+  </div>
 
-  <label for="description">Description</label>
-  <textarea bind:value={data.description} id="description" name="description"></textarea>
-
-  <PicturesInput bind:existed bind:attached={attaches} bind:removed={removals}/>
-
-  <button type="submit">
+  <ProcessButton loading={loading}>
     {#if data.id}
       Save
     {:else}
       Create
     {/if}
-  </button>
+  </ProcessButton>
+
+  {#if data.id}
+    <Link to={uri.compile(URI_ROOM_VIEW, { property: property.id,  id: data.id })} getProps={getCancelLinkProps}>Cancel</Link>
+  {:else}
+    <Link to={uri.compile(URI_ROOM_INDEX, { property: property.id })} getProps={getCancelLinkProps}>Cancel</Link>
+  {/if}
 </form>

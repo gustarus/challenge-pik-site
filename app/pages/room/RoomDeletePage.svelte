@@ -2,6 +2,7 @@
   import api from './../../instances/api';
   import uri from './../../instances/uri';
   import { navigate } from 'svelte-routing';
+  import LoadingContent from './../../components/LoadingContent';
   import {
     URI_PROPERTY_DELETE,
     URI_PROPERTY_INDEX,
@@ -17,9 +18,8 @@
   const id = parseInt(params.id, 10);
 
   // loading elements
-  $: property = {};
-  $: data = {};
-  $: pictures = [];
+  let property = {};
+  let data = {};
   api.get(uri.compile(URI_API_PROPERTY, { id: propertyId })).then((response) => {
     property = response.data;
     return api.get(uri.compile(URI_API_ROOM, { id }));
@@ -36,10 +36,4 @@
   });
 </script>
 
-<style>
-	h1 {
-		color: purple;
-	}
-</style>
-
-<h1>Property delete page</h1>
+<LoadingContent loading />

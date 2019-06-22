@@ -1,53 +1,74 @@
 <script>
   import api from './../../instances/api';
   import uri from './../../instances/uri';
+  import { title } from './../../stores/meta';
   import { Link } from 'svelte-routing';
+  import LoadingContent from './../../components/LoadingContent.svelte';
   import {
     URI_API_ROOMS_SEARCH,
     URI_ROOM_INDEX,
     URI_ROOM_CREATE,
     URI_ROOM_VIEW,
     URI_API_PROPERTY,
+    URI_PROPERTY_VIEW,
   } from './../../constants';
+
+  $title = 'Property rooms';
 
   // getting path params
   const params = uri.parse(window.location.pathname, URI_ROOM_INDEX); // TODO Extract this to route logic.
   const propertyId = parseInt(params.property, 10);
 
   // loading elements
-  $: property = {};
-  $: data = [];
+  let property = {};
+  let data = [];
+  let loading = true;
   api.get(uri.compile(URI_API_PROPERTY, { id: propertyId })).then((response) => {
     property = response.data;
+
+    $title = `Property "${property.title}" rooms`;
+
     const query = { property_id: property.id };
     return api.get(URI_API_ROOMS_SEARCH, query)
   }).then((response) => {
     data = [...Object.values(response.data)];
+    loading = false;
   });
+
+  function getLinkProps() {
+    return { class: 'btn btn-secondary btn-block'};
+  }
+
+  function getCreateLinkProps() {
+    return { class: 'btn btn-success btn-block' };
+  }
+
+  function getViewLinkProps() {
+    return { class: 'list-group-item list-group-item-action' };
+  }
 </script>
 
 <style>
-	h1 {
-		color: purple;
-	}
+  .content {
+    margin-top: 1rem;
+  }
 </style>
 
-<h1>Rooms page</h1>
-{#if property.id}
-  <div>
-    Id: #{property.id}
-    <Link to={uri.compile(URI_ROOM_CREATE, { property: propertyId })}>Create room</Link>
-  </div>
+<Link to={uri.compile(URI_PROPERTY_VIEW, { id: propertyId })} getProps={getLinkProps}>Go to the property</Link>
+<Link to={uri.compile(URI_ROOM_CREATE, { property: propertyId })} getProps={getCreateLinkProps}>Add room to the property</Link>
 
-  <ul>
-    {#each data as item}
-      <li>
-        <a href={uri.compile(URI_ROOM_VIEW, { property: propertyId, id: item.id })}>
-          {item.title}
-        </a>
-      </li>
-    {/each}
-  </ul>
-{:else}
-  Loading...
-{/if}
+<div class="content">
+  <LoadingContent loading={loading}>
+    {#if data.length}
+      <div class="list-group">
+        {#each data as item}
+          <Link to={uri.compile(URI_ROOM_VIEW, { property: propertyId, id: item.id })} getProps={getViewLinkProps}>
+            {item.title}, {item.address}
+          </Link>
+        {/each}
+      </div>
+    {:else}
+      <span class="text-muted">Empty list received</span>
+    {/if}
+  </LoadingContent>
+</div>
