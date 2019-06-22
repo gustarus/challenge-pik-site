@@ -2,6 +2,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const svelteGlobalCSS = require('svelte-preprocess-css-global');
+const TerserJSPlugin = require('terser-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const path = require('path');
 const variables = require(path.join(__dirname, 'template.config.js'));
 
@@ -11,6 +13,10 @@ const prod = mode === 'production';
 const publicPath = path.join(__dirname, '..', 'public');
 
 module.exports = {
+  mode,
+
+  devtool: prod ? 'cheap-module-source-map' : 'source-map',
+
   entry: {
     app: [path.join(__dirname, '..', 'app', 'index.js')]
   },
@@ -24,9 +30,13 @@ module.exports = {
 
   output: {
     path: publicPath,
-    filename: '[name].[hash].js',
-    chunkFilename: '[name].[id].[hash].js',
+    filename: `[name]${prod && '.[hash]'}.js`,
+    chunkFilename: `[name].[id]${prod && '.[hash]'}.js`,
     publicPath: '/',
+  },
+
+  optimization: {
+    minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
   },
 
   module: {
@@ -62,11 +72,9 @@ module.exports = {
     ]
   },
 
-  mode,
-
   plugins: [
     new MiniCssExtractPlugin({
-      filename: '[name].[hash].css'
+      filename: `[name].${prod && '[hash]'}.css`
     }),
 
     new HtmlPlugin({
@@ -83,6 +91,4 @@ module.exports = {
       { from: path.join(__dirname, '..', 'app', 'images', 'icons', 'logo-512.png'), to: path.join(publicPath, 'logo-512.png') },
     ]),
   ],
-
-  devtool: prod ? false : 'source-map'
 };
