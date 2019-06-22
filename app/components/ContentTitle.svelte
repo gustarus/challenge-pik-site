@@ -1,8 +1,8 @@
 <script>
-  import { title } from './../stores/meta';
+  import { header, title } from './../stores/meta';
 </script>
 
-{#if $title}
-  <h3>{$title}</h3>
+{#if $header || $title}
+  <h3>{$header || $title}</h3>
   <hr />
 {/if}
