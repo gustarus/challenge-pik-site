@@ -6,6 +6,6 @@
   if (window.location.path !== path) {
     console.log(`[ROUTER] Redirect to '${path}' triggered`);
     // window.location = path; // TODO Use navigate instead of location change, but be aware of redirect from default to login page when not logged.
-    navigate(path);
+    setTimeout(() => navigate(path));
   }
 </script>
