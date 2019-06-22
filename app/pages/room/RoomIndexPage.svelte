@@ -28,8 +28,8 @@
 
     $title = `Property "${property.title}" rooms`;
 
-    const query = { property_id: property.id };
-    return api.get(URI_API_ROOMS_SEARCH, query)
+    const params = { property_id: property.id };
+    return api.get(URI_API_ROOMS_SEARCH, { params })
   }).then((response) => {
     data = [...Object.values(response.data)];
     loading = false;
@@ -51,7 +51,7 @@
       <div class="list-group">
         {#each data as item}
           <Link to={uri.compile(URI_ROOM_VIEW, { property: propertyId, id: item.id })} class="list-group-item list-group-item-action">
-            {item.title}, {item.address}
+            {item.title}
           </Link>
         {/each}
       </div>
