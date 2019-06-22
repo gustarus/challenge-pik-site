@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher, onMount, beforeUpdate, onDestroy } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import uri from './../instances/uri';
   import notify from './../instances/notify';
   import handleApiError from './../helpers/handleApiError';
@@ -20,8 +20,8 @@
   const dispatch = createEventDispatcher();
 
   // previews storage
-  let existedPreviews = [];
-  let attachedPreviews = [];
+  $: existedPreviews = existed.map((item) => uri.absolute(API_URL, URI_API_PICTURE, { id: item.file_id }));
+  $: attachedPreviews = attached.map((item) => item.preview);
 
   // capture picture elements
   let videoContainerEl;
@@ -41,12 +41,6 @@
 
   onMount(async () => {
     await connectActiveStream();
-  });
-
-  beforeUpdate(async () => {
-    // rebuild previews collections
-    existedPreviews = existed.map((item) => uri.absolute(API_URL, URI_API_PICTURE, { id: item.file_id }));
-    attachedPreviews = attached.map((item) => item.preview);
   });
 
   onDestroy(async () => {
