@@ -1,7 +1,8 @@
 <script>
-  import { createEventDispatcher, beforeUpdate } from 'svelte';
+  import { createEventDispatcher, onMount, beforeUpdate } from 'svelte';
   import uri from './../instances/uri';
   import notify from './../instances/notify';
+  import handleApiError from './../helpers/handleApiError';
   import resizePictureFromDataUri from './../helpers/resizePictureFromDataUri';
   import { API_URL, URI_API_PICTURE, PREVIEW_MAX_SIZE, IMAGE_MAX_SIZE } from './../constants';
 
@@ -17,8 +18,14 @@
 
   const dispatch = createEventDispatcher();
 
+  const constraints = { video: { width: IMAGE_MAX_SIZE, height: IMAGE_MAX_SIZE }, audio: false };
+
   let existedPreviews = [];
   let attachedPreviews = [];
+
+  let placeholder;
+  let canvas;
+  let video;
 
   beforeUpdate(() => {
     existedPreviews = existed.map((item) => uri.absolute(API_URL, URI_API_PICTURE, { id: item.file_id }));
@@ -29,35 +36,14 @@
     throw new Error('Unsupported file api detected');
   }
 
-  async function onAttach(e) {
-    const files = e.target.files;
-    for (let i = 0; files[i]; i++) {
-      const file = files[i];
-      if (!file.type.match('image.*')) {
-        notify.show('Invalid file passed: should be an image');
-        continue;
-      }
+  async function onAttach(dataURI) {
+    // resize pictures for processing
+    const preview = await resizePictureFromDataUri(dataURI, previewMaxSize, previewMaxSize);
+    const content = await resizePictureFromDataUri(dataURI, pictureMaxSize, pictureMaxSize);
 
-      // resize pictures and wait while resize finished
-      await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          // create resize promises for preview and for content
-          const onResizePreview = resizePictureFromDataUri(e.target.result, previewMaxSize, previewMaxSize);
-          const onResizeContent = resizePictureFromDataUri(e.target.result, pictureMaxSize, pictureMaxSize);
-
-          // wait while resize promises resolved
-          Promise.all([onResizePreview, onResizeContent]).then(([preview, content]) => {
-            file.preview = preview;
-            file.content = content;
-            attached = [...attached, file];
-            resolve();
-          }).catch(reject);
-        };
-
-        reader.readAsDataURL(file);
-      });
-    }
+    // prepend picture
+    const item = { preview, content };
+    attached = [item, ...attached];
   }
 
   async function onDetach(e) {
@@ -74,9 +60,58 @@
     existed = existed;
     removed = [...removed, spliced[0]];
   }
+
+  onMount(() => {
+    let width = pictureMaxSize;
+    let height = 0;
+
+    function takePicture() {
+      const context = canvas.getContext('2d');
+      if (width && height) {
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(video, 0, 0, width, height);
+        onAttach(canvas.toDataURL('image/png'));
+      }
+    }
+
+    let streaming;
+    video.addEventListener('canplay', () => {
+      if (!streaming) {
+        height = video.videoHeight / (video.videoWidth/width);
+
+        const previewWidth = placeholder.clientWidth;
+        const previewHeight = placeholder.clientHeight;
+
+        video.setAttribute('width', previewWidth);
+        video.setAttribute('height', previewHeight);
+
+        canvas.setAttribute('width', width);
+        canvas.setAttribute('height', height);
+
+        streaming = true;
+      }
+    }, false);
+
+    placeholder.addEventListener('click', function(e) {
+      takePicture();
+      e.preventDefault();
+    }, false);
+
+    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+      video.srcObject = stream;
+      video.play();
+    }).catch((error) => {
+      handleApiError(error);
+    });
+  });
 </script>
 
 <style>
+  .canvas {
+    display: none;
+  }
+
   .pictures {
     font-size: 0;
     margin: -1rem 0 1rem -1rem;
@@ -96,7 +131,7 @@
   }
 
   .pictures__item-placeholder {
-    background: #fff;
+    background: #111;
   }
 
   .pictures__item-placeholder input {
@@ -132,8 +167,10 @@
 </style>
 
 <div class="row pictures">
-  <div class="card pictures__item pictures__item-placeholder">
-    <input type="file" id={id} accept="image/*" capture="camera" on:change={onAttach} />
+  <canvas bind:this={canvas} class="canvas"></canvas>
+
+  <div class="card pictures__item pictures__item-placeholder" bind:this={placeholder}>
+    <video bind:this={video}>Video stream not available.</video>
   </div>
 
   {#each attachedPreviews as src, i}
