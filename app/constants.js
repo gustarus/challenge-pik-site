@@ -8,7 +8,7 @@ export const STORAGE_KEY_TOKEN = 'token';
 export const HTTP_STATUS_VALIDATION_ERROR = 422;
 
 export const PREVIEW_MAX_SIZE = 500;
-export const IMAGE_MAX_SIZE = 1280;
+export const IMAGE_MAX_SIZE = 1280; // valid value for safari browser
 
 export const URI_DEFAULT = '/';
 export const URI_REGISTER = '/register';
