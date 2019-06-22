@@ -48,8 +48,9 @@
       <OpenIconicTheme>
         <div class="container">
           <Router url={url}>
-            <InstallPrompt />
             <Navigation />
+
+            <InstallPrompt />
 
             <div>
               <PublicRoute path={URI_REGISTER} component={RegisterAuthPage} />
