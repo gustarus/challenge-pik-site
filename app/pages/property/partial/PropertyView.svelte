@@ -25,6 +25,7 @@
   }
 
   .pictures__item {
+    vertical-align: top;
     display: inline-block;
     border: 1px solid #ced4da;
     height: 200px;
