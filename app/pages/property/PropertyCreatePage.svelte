@@ -1,12 +1,8 @@
 <script>
+  import { title } from './../../stores/meta';
   import PropertyForm from './partial/PropertyForm';
+
+  $title = 'Create new property';
 </script>
 
-<style>
-	h1 {
-		color: purple;
-	}
-</style>
-
-<h1>Property create page</h1>
 <PropertyForm />

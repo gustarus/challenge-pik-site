@@ -74,4 +74,17 @@ export default class Uri {
 
     return result;
   }
+
+  /**
+   * Compile absolute uri.
+   * @param baseUrl
+   * @param pathTemplate
+   * @param params
+   * @returns {string}
+   */
+  absolute(baseUrl, pathTemplate, params = {}) {
+    const baseUrlFormatted = baseUrl.replace(/\/+$/, '');
+    const pathFormatted = this.compile(pathTemplate, params).replace(/^\/+/, '');
+    return `${baseUrlFormatted}/${pathFormatted}`;
+  }
 }

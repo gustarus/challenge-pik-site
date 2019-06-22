@@ -1,28 +1,30 @@
 <script>
+  let container;
+  let install;
+
   window.addEventListener('beforeinstallprompt', (deferredPrompt) => {
     deferredPrompt.preventDefault();
-
-    const button = document.getElementById('install');
-
-    button.style.display = 'block';
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      button.style.display = 'none';
+    install.addEventListener('click', (e) => {
+      container.style.display = 'none';
 
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(() => {
         deferredPrompt = null;
       });
     });
+
+    container.style.display = 'block';
   });
 </script>
 
 <style>
-  .container {
-    position: relative;
+  .component {
+    margin-top: 1rem;
   }
 </style>
 
-<div class="container">
-  <a href="/" id="install" style="display: none;">Install our app</a>
+<div style="display: none;" class="component" bind:this={container}>
+  <div class="alert alert-info fade show" role="alert">
+    <strong>Install our app to the home screen.</strong> <a href="#" bind:this={install}>Click the link to install the app</a>
+  </div>
 </div>

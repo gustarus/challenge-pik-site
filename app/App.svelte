@@ -2,7 +2,12 @@
   import { Router, Link, Route } from 'svelte-routing';
   import PrivateRoute from './components/PrivateRoute';
   import PublicRoute from './components/PublicRoute';
+  import ResetStylesTheme from './themes/ResetStylesTheme.svelte';
+  import BootstrapTheme from './themes/BootstrapTheme.svelte';
+  import OpenIconicTheme from './themes/OpenIconicTheme.svelte';
   import InstallPrompt from './components/InstallPrompt.svelte';
+  import ContentTitle from './components/ContentTitle.svelte';
+  import DynamicMeta from './components/DynamicMeta.svelte';
   import ServiceWorker from './components/ServiceWorker.svelte';
   import DefaultHomePage from './pages/home/DefaultHomePage';
   import RegisterAuthPage from './pages/auth/RegisterAuthPage';
@@ -37,30 +42,45 @@
   } from './constants';
 
   export let url = '';
+
+
 </script>
 
-<Router url={url}>
-  <ServiceWorker />
-  <InstallPrompt />
-  <Navigation />
+<ServiceWorker>
+  <DynamicMeta>
+    <ResetStylesTheme>
+      <BootstrapTheme>
+        <OpenIconicTheme>
+          <div class="container">
+            <Router url={url}>
+              <InstallPrompt />
+              <Navigation />
+              <ContentTitle />
 
-  <div>
-    <PublicRoute path={URI_REGISTER} component={RegisterAuthPage} />
-    <PublicRoute path={URI_LOGIN} component={LoginAuthPage} />
-    <PrivateRoute path={URI_LOGOUT} component={LogoutAuthPage} />
+              <PublicRoute path={URI_REGISTER} component={RegisterAuthPage} />
+              <PublicRoute path={URI_LOGIN} component={LoginAuthPage} />
+              <PrivateRoute path={URI_LOGOUT} component={LogoutAuthPage} />
 
-    <PrivateRoute path={URI_PROPERTY_INDEX} component={PropertyIndexPage} />
-    <PrivateRoute path={URI_PROPERTY_CREATE} component={PropertyCreatePage} />
-    <PrivateRoute path={URI_PROPERTY_UPDATE} component={PropertyUpdatePage} />
-    <PrivateRoute path={URI_PROPERTY_VIEW} component={PropertyViewPage} />
-    <PrivateRoute path={URI_PROPERTY_DELETE} component={PropertyDeletePage} />
+              <PrivateRoute path={URI_PROPERTY_INDEX} component={PropertyIndexPage} />
+              <PrivateRoute path={URI_PROPERTY_CREATE} component={PropertyCreatePage} />
+              <PrivateRoute path={URI_PROPERTY_UPDATE} component={PropertyUpdatePage} />
+              <PrivateRoute path={URI_PROPERTY_VIEW} component={PropertyViewPage} />
+              <PrivateRoute path={URI_PROPERTY_DELETE} component={PropertyDeletePage} />
 
-    <PrivateRoute path={URI_ROOM_INDEX} component={RoomIndexPage} />
-    <PrivateRoute path={URI_ROOM_CREATE} component={RoomCreatePage} />
-    <PrivateRoute path={URI_ROOM_UPDATE} component={RoomUpdatePage} />
-    <PrivateRoute path={URI_ROOM_VIEW} component={RoomViewPage} />
-    <PrivateRoute path={URI_ROOM_DELETE} component={RoomDeletePage} />
+              <PrivateRoute path={URI_ROOM_INDEX} component={RoomIndexPage} />
+              <PrivateRoute path={URI_ROOM_CREATE} component={RoomCreatePage} />
+              <PrivateRoute path={URI_ROOM_UPDATE} component={RoomUpdatePage} />
+              <PrivateRoute path={URI_ROOM_VIEW} component={RoomViewPage} />
+              <PrivateRoute path={URI_ROOM_DELETE} component={RoomDeletePage} />
 
-    <PrivateRoute path={URI_DEFAULT} component={DefaultHomePage} />
-  </div>
-</Router>
+              <PrivateRoute path={URI_DEFAULT} component={DefaultHomePage} />
+            </Router>
+          </div>
+          <br />
+          <br />
+          <br />
+        </OpenIconicTheme>
+      </BootstrapTheme>
+    </ResetStylesTheme>
+  </DynamicMeta>
+</ServiceWorker>

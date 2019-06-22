@@ -1,23 +1,22 @@
 <script>
-  import getFormData from 'get-form-data';
   import { navigate } from 'svelte-routing';
+  import Link from './../../../components/Link.svelte';
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
   import notify from './../../../instances/notify';
-  import resizePictureFromDataUri from './../../../helpers/resizePictureFromDataUri';
-  import convertDataUriToBlob from './../../../helpers/convertDataUriToBlob';
+  import handleApiError from './../../../helpers/handleApiError';
+  import PicturesInput from './../../../components/PicturesInput.svelte';
+  import ProcessButton from './../../../components/ProcessButton.svelte';
   import {
     API_URL,
     URI_API_PICTURE,
     URI_API_PROPERTIES,
     URI_API_PROPERTY,
-    HTTP_STATUS_VALIDATION_ERROR,
     URI_PROPERTY_VIEW,
+    URI_PROPERTY_INDEX,
     URI_API_PICTURES,
     URI_API_PROPERTY_PICTURES,
     URI_API_PROPERTY_PICTURE,
-    IMAGE_MAX_WIDTH,
-    IMAGE_MAX_HEIGHT,
   } from './../../../constants';
 
   export let data = {
@@ -32,21 +31,23 @@
 
   export let pictures = [];
 
-  $: display = pictures;
+  let attaches = [];
+  let removals = [];
 
-  $: uploads = [];
+  $: cancelUri = data.id
+    ? uri.compile(URI_PROPERTY_VIEW, { id: data.id }) : URI_PROPERTY_INDEX;
 
-  $: removals = [];
-
-  $: previews = [];
-
-  // TODO Get properties list via api.
-  // TODO Extract pictures logic to the separate component.
-
+  let loading = false;
   async function onSubmit(e) {
     e.preventDefault();
+    if (e.target.checkValidity() === false) {
+      e.target.classList.add('was-validated');
+      return;
+    }
 
     try {
+      loading = true;
+
       // save the property
       const uriToPropertyApi = data.id
         ? uri.compile(URI_API_PROPERTY, { id: data.id })
@@ -55,16 +56,10 @@
       const response = await processor(uriToPropertyApi, data);
 
       // save and bind the pictures
-      for (const i in uploads) {
-        const dataUri = resizePictureFromDataUri(previews[i], IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT);
-        const fileResized = convertDataUriToBlob(dataUri);
+      for (const file of attaches) {
+        const fileResponse = await api.upload(URI_API_PICTURES, file.content);
 
-        // upload the file
-        const data = new FormData();
-        data.append('file', fileResized);
-        const fileResponse = await api.post(URI_API_PICTURES, data);
-
-        // bind the file
+        // connect the file
         const relationData = { property_id: response.data.id, file_id: fileResponse.data.id };
         await api.post(URI_API_PROPERTY_PICTURES, relationData);
       }
@@ -74,110 +69,83 @@
         await api.delete(uri.compile(URI_API_PROPERTY_PICTURE, { id: picture.id }));
       }
 
+      loading = false;
       navigate(uri.compile(URI_PROPERTY_VIEW, { id: response.data.id }));
     } catch(e) {
-      let message = e.response && e.response.status && e.response.status === HTTP_STATUS_VALIDATION_ERROR
-        ? e.response.data[0].message : e.message;
-      notify.show(message);
+      loading = false;
+      handleApiError(e);
     }
-  }
-
-  async function onCapture(e) {
-    const files = e.target.files; // TODO Check files api support.
-    for (let i = 0; files[i]; i++) {
-      const file = files[i];
-      if (!file.type.match('image.*')) { // TODO Show alert when it is not a picture.
-        continue;
-      }
-
-      uploads.push(file);
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        previews[i] = e.target.result;
-      };
-
-      reader.readAsDataURL(file);
-    }
-  }
-
-  async function onUnselect(e) {
-    e.preventDefault();
-    const index = parseInt(e.target.dataset.index, 10);
-
-    previews.splice(index, 1); // TODO Normal functionality to remove item.
-    previews = [...previews];
-
-    uploads.splice(index, 1); // TODO Normal functionality to remove item.
-    uploads = [...uploads];
-  }
-
-  async function onRemove(e) {
-    e.preventDefault();
-    const index = parseInt(e.target.dataset.index, 10);
-    const picture = display[index];
-    display.splice(index, 1); // TODO Normal functionality to remove item.
-    display = [...display];
-    removals.push(picture);
   }
 </script>
 
-<style>
-	h1 {
-		color: purple;
-	}
-</style>
-
-<div>Id: {data.id}</div>
-
-<form on:submit={onSubmit}>
-  Select type <sup>*</sup>
-  <select name="type" bind:value={data.type} required>
-    <option value="">-- Select --</option>
-    <option value="residential">Residential</option>
-    <option value="commercial">Commercial</option>
-  </select>
-
-  <label for="title">Title <sup>*</sup></label>
-  <input bind:value={data.title} type="text" id="title" name="title" required />
-
-  <label for="description">Description</label>
-  <textarea bind:value={data.description} id="description" name="description"></textarea>
-
-  <label for="address">Address <sup>*</sup></label>
-  <input bind:value={data.address} type="text" id="address" name="address" required />
-
-  <label for="square">Square <sup>*</sup></label>
-  <input bind:value={data.square} type="number" id="square" name="square" required />
-
-  <label for="price">Price <sup>*</sup></label>
-  <input bind:value={data.price} type="number" id="price" name="price" required />
-
-  <div id="pictures">
-    {#each previews as preview, i}
-      <div class="picture">
-        <a href="/" on:click={onUnselect} data-index={i}>Delete</a>
-        <img src={preview} />
-      </div>
-    {/each}
-
-    {#each display as picture, i}
-      <div class="picture">
-        <a href="/" on:click={onRemove} data-index={i}>Delete</a>
-        <img src={API_URL}{uri.compile(URI_API_PICTURE, { id: picture.file_id })} />
-      </div>
-    {/each}
-
-    <div class="picture picture-placeholder">
-      <input type="file" accept="image/*" capture="camera" on:change={onCapture} />
+<form on:submit={onSubmit} class="needs-validation" novalidate>
+  <div class="form-group">
+    <label for="type">Select type <sup class="text-danger">*</sup></label>
+    <select bind:value={data.type} class="form-control" required id="type">
+      <option value=""></option>
+      <option value="residential">Residential</option>
+      <option value="commercial">Commercial</option>
+    </select>
+    <div class="invalid-feedback">
+      Please choose a type.
     </div>
   </div>
 
-  <button type="submit">
+  <div class="form-group">
+    <label for="title">Property name <sup class="text-danger">*</sup></label>
+    <input bind:value={data.title} type="text" class="form-control" required id="title">
+    <div class="invalid-feedback">
+      Please choose a name for the property.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Property description</label>
+    <textarea bind:value={data.description} id="description" class="form-control"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="address">Property address <sup class="text-danger">*</sup></label>
+    <input bind:value={data.address} type="text" class="form-control" required id="address">
+    <div class="invalid-feedback">
+      Please enter address for the property.
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="square">Property square <sup class="text-danger">*</sup></label>
+        <input bind:value={data.square} type="number" id="square" class="form-control" required />
+        <div class="invalid-feedback">
+          Please enter square size for the property.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="price">Property price <sup class="text-danger">*</sup></label>
+        <input bind:value={data.price} type="number" id="price" class="form-control" required />
+        <div class="invalid-feedback">
+          Please enter price for the property.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="pictures">Property pictures</label>
+    <PicturesInput bind:existed={pictures} bind:attached={attaches} bind:removed={removals} id="pictures" />
+  </div>
+
+  <ProcessButton loading={loading}>
     {#if data.id}
       Save
     {:else}
       Create
     {/if}
-  </button>
+  </ProcessButton>
+
+  <Link to={cancelUri} class="btn btn-info btn-block">Cancel</Link>
 </form>

@@ -7,8 +7,8 @@ export const STORAGE_KEY_TOKEN = 'token';
 
 export const HTTP_STATUS_VALIDATION_ERROR = 422;
 
-export const IMAGE_MAX_WIDTH = 1200;
-export const IMAGE_MAX_HEIGHT = IMAGE_MAX_WIDTH;
+export const PREVIEW_MAX_SIZE = 500;
+export const IMAGE_MAX_SIZE = 1200;
 
 export const URI_DEFAULT = '/';
 export const URI_REGISTER = '/register';
