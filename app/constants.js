@@ -1,4 +1,4 @@
-export const API_URL = 'http://localhost:3000';
+export const API_URL = 'https://api.challenge-pik.webulla.ru';
 export const API_TIMEOUT = 60000;
 
 export const STORAGE_KEY = 'ChallengePikSite';

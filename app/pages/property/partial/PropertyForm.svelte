@@ -1,5 +1,6 @@
 <script>
-  import { navigate, Link } from 'svelte-routing';
+  import { navigate } from 'svelte-routing';
+  import Link from './../../../components/Link.svelte';
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
   import notify from './../../../instances/notify';
@@ -32,6 +33,9 @@
 
   let attaches = [];
   let removals = [];
+
+  $: cancelUri = data.id
+    ? uri.compile(URI_PROPERTY_VIEW, { id: data.id }) : URI_PROPERTY_INDEX;
 
   let loading = false;
   async function onSubmit(e) {
@@ -71,10 +75,6 @@
       loading = false;
       handleApiError(e);
     }
-  }
-
-  function getCancelLinkProps() {
-    return { class: 'btn btn-info btn-block'};
   }
 </script>
 
@@ -147,9 +147,5 @@
     {/if}
   </ProcessButton>
 
-  {#if data.id}
-    <Link to={uri.compile(URI_PROPERTY_VIEW, { id: data.id })} getProps={getCancelLinkProps}>Cancel</Link>
-  {:else}
-    <Link to={URI_PROPERTY_INDEX} getProps={getCancelLinkProps}>Cancel</Link>
-  {/if}
+  <Link to={cancelUri} class="btn btn-info btn-block">Cancel</Link>
 </form>

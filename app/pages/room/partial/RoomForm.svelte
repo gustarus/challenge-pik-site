@@ -1,8 +1,9 @@
 <script>
-  import { navigate, Link } from 'svelte-routing';
+  import { navigate } from 'svelte-routing';
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
   import handleApiError from './../../../helpers/handleApiError';
+  import Link from './../../../components/Link.svelte';
   import notify from './../../../instances/notify';
   import PicturesInput from './../../../components/PicturesInput.svelte';
   import ProcessButton from './../../../components/ProcessButton.svelte';
@@ -38,6 +39,10 @@
 
   let attaches = [];
   let removals = [];
+
+  $: cancelUri = data.id
+    ? uri.compile(URI_ROOM_VIEW, { property: property.id,  id: data.id })
+    : uri.compile(URI_ROOM_INDEX, { property: property.id });
 
   let loading = false;
   async function onSubmit(e) {
@@ -80,10 +85,6 @@
       loading = false;
       handleApiError(e);
     }
-  }
-
-  function getCancelLinkProps() {
-    return { class: 'btn btn-info btn-block'};
   }
 </script>
 
@@ -131,9 +132,5 @@
     {/if}
   </ProcessButton>
 
-  {#if data.id}
-    <Link to={uri.compile(URI_ROOM_VIEW, { property: property.id,  id: data.id })} getProps={getCancelLinkProps}>Cancel</Link>
-  {:else}
-    <Link to={uri.compile(URI_ROOM_INDEX, { property: property.id })} getProps={getCancelLinkProps}>Cancel</Link>
-  {/if}
+  <Link to={cancelUri} class="btn btn-info btn-block">Cancel</Link>
 </form>

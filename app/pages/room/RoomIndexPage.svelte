@@ -2,7 +2,7 @@
   import api from './../../instances/api';
   import uri from './../../instances/uri';
   import { title } from './../../stores/meta';
-  import { Link } from 'svelte-routing';
+  import Link from './../../components/Link.svelte';
   import LoadingContent from './../../components/LoadingContent.svelte';
   import {
     URI_API_ROOMS_SEARCH,
@@ -34,18 +34,6 @@
     data = [...Object.values(response.data)];
     loading = false;
   });
-
-  function getLinkProps() {
-    return { class: 'btn btn-secondary btn-block'};
-  }
-
-  function getCreateLinkProps() {
-    return { class: 'btn btn-success btn-block' };
-  }
-
-  function getViewLinkProps() {
-    return { class: 'list-group-item list-group-item-action' };
-  }
 </script>
 
 <style>
@@ -54,15 +42,15 @@
   }
 </style>
 
-<Link to={uri.compile(URI_PROPERTY_VIEW, { id: propertyId })} getProps={getLinkProps}>Go to the property</Link>
-<Link to={uri.compile(URI_ROOM_CREATE, { property: propertyId })} getProps={getCreateLinkProps}>Add room to the property</Link>
+<Link to={uri.compile(URI_PROPERTY_VIEW, { id: propertyId })} class="btn btn-secondary btn-block">Go to the property</Link>
+<Link to={uri.compile(URI_ROOM_CREATE, { property: propertyId })} class="btn btn-success btn-block">Add room to the property</Link>
 
 <div class="content">
   <LoadingContent loading={loading}>
     {#if data.length}
       <div class="list-group">
         {#each data as item}
-          <Link to={uri.compile(URI_ROOM_VIEW, { property: propertyId, id: item.id })} getProps={getViewLinkProps}>
+          <Link to={uri.compile(URI_ROOM_VIEW, { property: propertyId, id: item.id })} class="list-group-item list-group-item-action">
             {item.title}, {item.address}
           </Link>
         {/each}

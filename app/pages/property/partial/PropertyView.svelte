@@ -1,5 +1,5 @@
 <script>
-  import { Link } from 'svelte-routing';
+  import Link from './../../../components/Link.svelte';
   import uri from './../../../instances/uri';
   import LoadingPicture from './../../../components/LoadingPicture.svelte';
   import {
@@ -12,14 +12,6 @@
 
   export let data = {};
   export let pictures = [];
-
-  function getLinkProps() {
-    return { class: 'btn btn-secondary btn-block' };
-  }
-
-  function getDeleteLinkProps() {
-    return { class: 'btn btn-danger btn-block' };
-  }
 </script>
 
 <style>
@@ -46,7 +38,7 @@
   }
 </style>
 
-<Link to={uri.compile(URI_ROOM_INDEX, { property: data.id })} getProps={getLinkProps}>Rooms</Link>
+<Link to={uri.compile(URI_ROOM_INDEX, { property: data.id })} class="btn btn-secondary btn-block">Rooms</Link>
 
 <div class="jumbotron jumbotron-fluid component">
   <div class="container">
@@ -75,5 +67,5 @@
   </div>
 </div>
 
-<Link to={uri.compile(URI_PROPERTY_UPDATE, { id: data.id })} getProps={getLinkProps}>Update</Link>
-<Link to={uri.compile(URI_PROPERTY_DELETE, { id: data.id })} getProps={getDeleteLinkProps}>Delete</Link>
+<Link to={uri.compile(URI_PROPERTY_UPDATE, { id: data.id })} class="btn btn-secondary btn-block">Update</Link>
+<Link to={uri.compile(URI_PROPERTY_DELETE, { id: data.id })} class="btn btn-danger btn-block">Delete</Link>

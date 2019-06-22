@@ -3,7 +3,7 @@
   import api from './../../instances/api';
   import uri from './../../instances/uri';
   import { title } from './../../stores/meta';
-  import { Link } from 'svelte-routing';
+  import Link from './../../components/Link.svelte';
   import LoadingContent from './../../components/LoadingContent';
   import {
     URI_API_PROPERTIES,
@@ -20,14 +20,6 @@
     data = Object.values(response.data);
     loading = false;
   });
-
-  function getCreateLinkProps() {
-    return { class: 'btn btn-success btn-block' }
-  }
-
-  function getViewLinkProps() {
-    return { class: 'list-group-item list-group-item-action' };
-  }
 </script>
 
 <style>
@@ -36,14 +28,14 @@
   }
 </style>
 
-<Link to={URI_PROPERTY_CREATE} getProps={getCreateLinkProps}>Create</Link>
+<Link to={URI_PROPERTY_CREATE} class="btn btn-success btn-block">Create</Link>
 
 <div class="content">
   <LoadingContent loading={loading}>
     {#if data.length}
       <div class="list-group">
         {#each data as item}
-          <Link to={uri.compile(URI_PROPERTY_VIEW, {id: item.id})} getProps={getViewLinkProps}>
+          <Link to={uri.compile(URI_PROPERTY_VIEW, {id: item.id})} class="list-group-item list-group-item-action">
             {item.title}, {item.address}
           </Link>
         {/each}
