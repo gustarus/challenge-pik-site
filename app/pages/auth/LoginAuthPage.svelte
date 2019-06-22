@@ -10,8 +10,7 @@
   export let password = '';
 
   let loading = false;
-  async function onSubmit(e) {
-    e.preventDefault();
+  async function onSuccess() {
     loading = true;
     const trigger = (success) => logged.update(() => success);
     await auth.login(email, password).then(trigger);
@@ -19,4 +18,4 @@
   }
 </script>
 
-<CredentialsForm bind:email bind:password on:submit={onSubmit} loading={loading} />
+<CredentialsForm bind:email bind:password on:success={onSuccess} loading={loading} />

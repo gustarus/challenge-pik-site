@@ -1,6 +1,7 @@
 <script>
   import uri from './../../instances/uri';
   import api from './../../instances/api';
+  import LoadingContent from './../../components/LoadingContent';
   import { navigate } from 'svelte-routing';
   import { URI_PROPERTY_DELETE, URI_PROPERTY_INDEX, URI_API_PROPERTY } from './../../constants';
 
@@ -15,10 +16,4 @@
   });
 </script>
 
-<style>
-	h1 {
-		color: purple;
-	}
-</style>
-
-<h1>Property delete page</h1>
+<LoadingContent loading />

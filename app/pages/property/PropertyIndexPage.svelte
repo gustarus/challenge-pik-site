@@ -2,7 +2,9 @@
   import auth from './../../instances/auth';
   import api from './../../instances/api';
   import uri from './../../instances/uri';
+  import { title } from './../../stores/meta';
   import { Link } from 'svelte-routing';
+  import LoadingContent from './../../components/LoadingContent';
   import {
     URI_API_PROPERTIES,
     URI_PROPERTY_CREATE,
@@ -10,30 +12,44 @@
     URI_API_PROPERTIES_SEARCH,
   } from './../../constants';
 
-  // TODO Protect properties with created by.
+  $title = 'My own properties';
 
-  // loading elements
-  $: data = [];
+  let data = [];
+  let loading = true;
   api.get(URI_API_PROPERTIES_SEARCH, { params: { created_by: auth.primary } }).then((response) => {
-    data = [...Object.values(response.data)];
+    data = Object.values(response.data);
+    loading = false;
   });
+
+  function getCreateLinkProps() {
+    return { class: 'btn btn-success btn-block' }
+  }
+
+  function getViewLinkProps() {
+    return { class: 'list-group-item list-group-item-action' };
+  }
 </script>
 
 <style>
-	h1 {
-		color: purple;
-	}
+  .content {
+    margin-top: 1rem;
+  }
 </style>
 
-<h1>Properties page</h1>
-<Link to={URI_PROPERTY_CREATE}>Create</Link>
+<Link to={URI_PROPERTY_CREATE} getProps={getCreateLinkProps}>Create</Link>
 
-<ul>
-	{#each data as item}
-		<li>
-		  <a href={uri.compile(URI_PROPERTY_VIEW, {id: item.id})}>
-		    {item.title}, {item.address}
-      </a>
-    </li>
-	{/each}
-</ul>
+<div class="content">
+  <LoadingContent loading={loading}>
+    {#if data.length}
+      <div class="list-group">
+        {#each data as item}
+          <Link to={uri.compile(URI_PROPERTY_VIEW, {id: item.id})} getProps={getViewLinkProps}>
+            {item.title}, {item.address}
+          </Link>
+        {/each}
+      </div>
+    {:else}
+      <span class="text-muted">Empty list received</span>
+    {/if}
+  </LoadingContent>
+</div>

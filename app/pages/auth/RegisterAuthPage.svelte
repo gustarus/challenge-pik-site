@@ -10,8 +10,7 @@
   $title = 'Sign up as new user';
 
   let loading = false;
-  async function onSubmit(e) {
-    e.preventDefault();
+  async function onSuccess() {
     loading = true;
 
     const registerSuccess = await auth.register(email, password);
@@ -31,4 +30,4 @@
   }
 </script>
 
-<CredentialsForm bind:email bind:password on:submit={onSubmit} loading={loading} />
+<CredentialsForm bind:email bind:password on:success={onSuccess} loading={loading} />

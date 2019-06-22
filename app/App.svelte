@@ -76,6 +76,9 @@
               <PrivateRoute path={URI_DEFAULT} component={DefaultHomePage} />
             </Router>
           </div>
+          <br />
+          <br />
+          <br />
         </OpenIconicTheme>
       </BootstrapTheme>
     </ResetStylesTheme>

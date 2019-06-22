@@ -2,6 +2,8 @@
   import { Link } from 'svelte-routing';
   import uri from './../../instances/uri';
   import api from './../../instances/api';
+  import { title } from './../../stores/meta';
+  import LoadingContent from './../../components/LoadingContent.svelte';
   import PropertyView from './partial/PropertyView';
   import {
     URI_PROPERTY_VIEW,
@@ -11,16 +13,20 @@
     URI_PROPERTY_DELETE,
   } from './../../constants';
 
+  $title = 'Details about the property';
+
   // getting path params
   const params = uri.parse(window.location.pathname, URI_PROPERTY_VIEW); // TODO Extract this to route logic.
   const id = parseInt(params.id, 10);
 
   // loading element
-  $: data = {};
-  $: pictures = [];
+  let data = {};
+  let pictures = [];
   const uriToPropertyApi = uri.compile(URI_API_PROPERTY, { id });
   api.get(uriToPropertyApi).then((response) => {
     data = response.data;
+
+    $title = `Details about the property "${data.title}"`;
 
     const query = { property_id: data.id };
     return api.get(URI_API_PROPERTY_PICTURES_SEARCH, query);
@@ -29,18 +35,6 @@
   });
 </script>
 
-<style>
-	h1 {
-		color: purple;
-	}
-</style>
-
-<h1>Property view page</h1>
-<Link to={uri.compile(URI_ROOM_INDEX, { property: id })}>Rooms</Link>
-<Link to={uri.compile(URI_PROPERTY_DELETE, { id })}>Delete</Link>
-
-{#if data.id}
+<LoadingContent loading={!data.id}>
   <PropertyView data={data} pictures={pictures} />
-{:else}
-  Loading...
-{/if}
+</LoadingContent>
