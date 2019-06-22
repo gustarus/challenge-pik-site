@@ -41,8 +41,8 @@
 
     $title = `Property "${property.title}" room "${data.title}" details`;
 
-    const query = { property_room_id: data.id };
-    return api.get(URI_API_ROOM_PICTURES_SEARCH, query);
+    const params = { property_room_id: data.id };
+    return api.get(URI_API_ROOM_PICTURES_SEARCH, { params });
   }).then((response) => {
     pictures = Object.values(response.data);
   });

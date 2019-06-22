@@ -22,8 +22,8 @@
     $title = `Update property "${data.title}"`;
 
     // load pictures
-    const query = { property_id: data.id };
-    return api.get(URI_API_PROPERTY_PICTURES_SEARCH, query);
+    const params = { property_id: data.id };
+    return api.get(URI_API_PROPERTY_PICTURES_SEARCH, { params} );
   }).then((response) => {
     pictures = Object.values(response.data);
   });
