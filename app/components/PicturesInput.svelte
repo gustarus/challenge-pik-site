@@ -14,27 +14,44 @@
 
   export let previewMaxSize = PREVIEW_MAX_SIZE;
   export let pictureMaxSize = IMAGE_MAX_SIZE;
+  export let sourceSelectDefaultLabel = 'Click here to select source';
 
 
   const dispatch = createEventDispatcher();
 
-  const constraints = { video: { width: IMAGE_MAX_SIZE, height: IMAGE_MAX_SIZE }, audio: false };
-
+  // previews storage
   let existedPreviews = [];
   let attachedPreviews = [];
 
-  let placeholder;
-  let canvas;
-  let video;
+  // capture picture elements
+  let videoContainerEl;
+  let canvasEl;
+  let videoEl;
+  let videoElWidth = 1;
+  let videoElHeight = 1;
+  let activeStream;
 
-  beforeUpdate(() => {
+  // camera source select elements
+  let sourceSelect;
+  let sourceSelectLabel = sourceSelectDefaultLabel;
+
+  // capture sizes
+  let width = pictureMaxSize;
+  let height = 0;
+
+  onMount(async () => {
+    await connectActiveStream();
+  });
+
+  beforeUpdate(async () => {
+    // rebuild previews collections
     existedPreviews = existed.map((item) => uri.absolute(API_URL, URI_API_PICTURE, { id: item.file_id }));
     attachedPreviews = attached.map((item) => item.preview);
   });
 
-  if (!window.FileReader) {
-    throw new Error('Unsupported file api detected');
-  }
+  onDestroy(async () => {
+    await stopActiveStream();
+  });
 
   async function onAttach(dataURI) {
     // resize pictures for processing
@@ -61,56 +78,88 @@
     removed = [...removed, spliced[0]];
   }
 
-  onMount(() => {
-    let width = pictureMaxSize;
-    let height = 0;
-
-    function takePicture() {
-      const context = canvas.getContext('2d');
-      if (width && height) {
-        canvas.width = width;
-        canvas.height = height;
-        context.drawImage(video, 0, 0, width, height);
-        onAttach(canvas.toDataURL('image/png'));
-      }
+  async function captureActiveStream() {
+    if (!activeStream) {
+      notify.show('Please, select source to take a picture');
+      return;
     }
 
-    let streaming;
-    video.addEventListener('canplay', () => {
-      if (!streaming) {
-        height = video.videoHeight / (video.videoWidth/width);
+    const context = canvasEl.getContext('2d');
+    if (width && height) {
+      canvasEl.width = width;
+      canvasEl.height = height;
+      context.drawImage(videoEl, 0, 0, width, height);
+      await onAttach(canvasEl.toDataURL('image/png'));
+    }
+  }
 
-        const previewWidth = placeholder.clientWidth;
-        const previewHeight = placeholder.clientHeight;
+  async function stopActiveStream() {
+    if (activeStream) {
+      activeStream.getTracks().forEach((track) => track.stop());
+      activeStream = null;
+    }
+  }
 
-        video.setAttribute('width', previewWidth);
-        video.setAttribute('height', previewHeight);
+  async function connectActiveStream() {
+    videoElWidth = videoContainerEl.clientWidth;
+    videoElHeight = videoContainerEl.clientHeight;
 
-        canvas.setAttribute('width', width);
-        canvas.setAttribute('height', height);
+    videoEl.setAttribute('width', videoElWidth);
+    videoEl.setAttribute('height', videoElHeight);
 
-        streaming = true;
-      }
+    videoEl.addEventListener('canplay', () => {
+      height = videoEl.videoHeight / (videoEl.videoWidth / width);
+      canvasEl.setAttribute('width', width);
+      canvasEl.setAttribute('height', height);
     }, false);
 
-    placeholder.addEventListener('click', function(e) {
-      takePicture();
-      e.preventDefault();
-    }, false);
+    navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
+      sourceSelect.innerHTML = '';
+      sourceSelect.appendChild(document.createElement('option'));
+      let count = 1;
+      mediaDevices.forEach((mediaDevice) => {
+        if (mediaDevice.kind === 'videoinput') {
+          const option = document.createElement('option');
+          option.value = mediaDevice.deviceId;
+          const label = mediaDevice.label || `Camera ${count++}`;
+          const textNode = document.createTextNode(label);
+          option.appendChild(textNode);
+          sourceSelect.appendChild(option);
+        }
+      });
+    }).catch(handleApiError);
+  }
+
+  async function onCapture(e) {
+    e.preventDefault();
+    await captureActiveStream();
+  }
+
+  async function onSourceChange() {
+    await stopActiveStream();
+
+    if (!sourceSelect.value) { // empty option selected
+      sourceSelectLabel = sourceSelectDefaultLabel;
+      return;
+    }
+
+    sourceSelectLabel = sourceSelect.options[sourceSelect.selectedIndex].innerText;
+
+    const constraints = {
+      audio: false,
+      video: {
+        width: IMAGE_MAX_SIZE,
+        height: IMAGE_MAX_SIZE,
+        deviceId: { exact: sourceSelect.value },
+      },
+    };
 
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-      video.srcObject = stream;
-      video.play();
-    }).catch((error) => {
-      handleApiError(error);
-    });
-  });
-
-  onDestroy(() => {
-    if (video.srcObject) {
-      video.srcObject.getTracks().forEach(track => track.stop());
-    }
-  });
+      activeStream = stream;
+      videoEl.srcObject = stream;
+      videoEl.play();
+    }).catch(handleApiError);
+  }
 </script>
 
 <style>
@@ -136,31 +185,61 @@
     margin: 1rem 0 0 1rem;
   }
 
-  .pictures__item-placeholder {
-    background: #111;
+  .pictures__item-source {
+    background: rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    position: relative;
   }
 
-  .pictures__item-placeholder input {
-    opacity: 0;
-    zoom: 200;
-    cursor: pointer;
-  }
-
-  .pictures__item-placeholder::before {
-    content: '+';
-    position: absolute;
+  .pictures__item-source label {
     display: block;
-    font-size: 80px;
-    font-weight: lighter;
-    color: #ced4da;
+    font-size: 14px;
+    line-height: 20px;
+    vertical-align: middle;
+    position: relative;
+    margin: 0;
+    padding: 0 10px;
+    color: #fff;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    margin-top: -6px;
+    text-align: center;
+  }
+
+  .pictures__item-source select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-appearance: none; /** safari height fix */
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .pictures__item-placeholder {
+    cursor: pointer;
+  }
+
+  .pictures__item-placeholder video {
+    pointer-events: none;
+  }
+
+  .pictures__item-placeholder span {
+    position: absolute;
+    display: block;
+    font-size: 50px;
+    font-weight: lighter;
+    color: rgba(0, 0, 0, 0.4);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 0;
+    pointer-events: none;
   }
 
   .pictures__item__delete {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.4);
     position: absolute;
     top: 0;
     right: 0;
@@ -173,10 +252,16 @@
 </style>
 
 <div class="row pictures">
-  <canvas bind:this={canvas} class="canvas"></canvas>
+  <canvas bind:this={canvasEl} class="canvas"></canvas>
 
-  <div class="card pictures__item pictures__item-placeholder" bind:this={placeholder}>
-    <video bind:this={video}>Video stream not available.</video>
+  <div class="card pictures__item pictures__item-source">
+    <label for="source-select">{sourceSelectLabel}</label>
+    <select bind:this={sourceSelect} id="source-select" on:change={onSourceChange} />
+  </div>
+
+  <div bind:this={videoContainerEl} on:click={onCapture} class="card pictures__item pictures__item-placeholder">
+    <video bind:this={videoEl} playsinline autoplay width="1" height="1">Video stream not available.</video>
+    <span class="oi" data-glyph="camera-slr"></span>
   </div>
 
   {#each attachedPreviews as src, i}
