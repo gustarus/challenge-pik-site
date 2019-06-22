@@ -69,6 +69,10 @@ module.exports = {
         test: /\.jade$/,
         use: 'jade-loader',
       },
+      {
+        test: /\.(png|woff|woff2|eot|ttf|svg|otf)$/,
+        loader: 'url-loader',
+      }
     ]
   },
 
@@ -89,6 +93,8 @@ module.exports = {
       { from: path.join(__dirname, '..', 'app', 'service-worker.js'), to: path.join(publicPath, 'service-worker.js') },
       { from: path.join(__dirname, '..', 'app', 'images', 'icons', 'logo-192.png'), to: path.join(publicPath, 'logo-192.png') },
       { from: path.join(__dirname, '..', 'app', 'images', 'icons', 'logo-512.png'), to: path.join(publicPath, 'logo-512.png') },
+      { from: path.join(__dirname, '..', 'app', 'images', 'icons', 'brand-192.png'), to: path.join(publicPath, 'brand-192.png') },
+      { from: path.join(__dirname, '..', 'app', 'images', 'icons', 'brand-512.png'), to: path.join(publicPath, 'brand-512.png') },
     ]),
   ],
 };
