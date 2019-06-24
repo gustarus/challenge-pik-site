@@ -59,6 +59,7 @@
 
   async function onDetach(e) {
     e.preventDefault();
+    e.stopPropagation();
     const index = parseInt(e.target.dataset.index, 10);
     attached.splice(index, 1);
     attached = attached;
@@ -66,10 +67,27 @@
 
   async function onRemove(e) {
     e.preventDefault();
+    e.stopPropagation();
     const index = parseInt(e.target.dataset.index, 10);
     const spliced = existed.splice(index, 1);
     existed = existed;
     removed = [...removed, spliced[0]];
+  }
+
+  async function onSelectAttached(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const index = parseInt(e.target.dataset.index, 10);
+    const src = attached[index].content;
+    dispatch('select:attached', { index, src });
+  }
+
+  async function onSelectExisted(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const index = parseInt(e.target.dataset.index, 10);
+    const src = uri.absolute(API_URL, URI_API_PICTURE, { id: existed[index].file_id });
+    dispatch('select:existed', { index, src });
   }
 
   async function captureActiveStream() {
@@ -177,6 +195,7 @@
     background-position: 50% 50%;
     border: 1px solid #ced4da;
     margin: 1rem 0 0 1rem;
+    cursor: pointer;
   }
 
   .pictures__item-source {
@@ -259,13 +278,13 @@
   </div>
 
   {#each attachedPreviews as src, i}
-    <div class="card pictures__item" style="background-image: url({src});">
+    <div class="card pictures__item" style="background-image: url({src});" on:click={onSelectAttached} data-index={i}>
       <a class="pictures__item__delete" on:click={onDetach} data-index={i}>✕</a>
     </div>
   {/each}
 
   {#each existedPreviews as src, i}
-    <div class="card pictures__item" style="background-image: url({src});">
+    <div class="card pictures__item" style="background-image: url({src});" on:click={onSelectExisted} data-index={i}>
       <a class="pictures__item__delete" on:click={onRemove} data-index={i}>✕</a>
     </div>
   {/each}

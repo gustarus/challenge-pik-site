@@ -7,6 +7,7 @@
   import notify from './../../../instances/notify';
   import PicturesInput from './../../../components/PicturesInput.svelte';
   import ProcessButton from './../../../components/ProcessButton.svelte';
+  import PlacemarksEditor from '../../../components/PlacemarksEditor.svelte';
   import {
     API_URL,
     URI_API_PICTURE,
@@ -43,6 +44,37 @@
   $: cancelUri = data.id
     ? uri.compile(URI_ROOM_VIEW, { property: property.id,  id: data.id })
     : uri.compile(URI_ROOM_INDEX, { property: property.id });
+
+
+  let editingSrc;
+  let editingIndex;
+  let editingCollection;
+  let editingPlacemarks = [{x:50, y: 50, title: 'Demo title'}];
+
+  async function onSelectAttached(e) {
+    const { index, src } = e.detail;
+    editingElement = attaches[index];
+    editingCollection = attaches;
+    editingIndex = index;
+    editingSrc = src;
+  }
+
+  async function onSelectExisted(e) {
+    const { index, src } = e.detail;
+    editingCollection = pictures;
+    editingIndex = index;
+    editingSrc = src;
+  }
+
+  async function onCloseClick(e) {
+    editingCollection[editingIndex]
+
+    editingPlacemarks = [];
+    editingCollection = null;
+    editingIndex = null;
+    editingSrc = null;
+  }
+
 
   let loading = false;
   async function onSubmit(e) {
@@ -121,7 +153,13 @@
 
   <div class="form-group">
     <label for="pictures">Room pictures</label>
-    <PicturesInput bind:existed={pictures} bind:attached={attaches} bind:removed={removals} id="pictures" />
+    <PicturesInput
+      bind:existed={pictures}
+      bind:attached={attaches}
+      bind:removed={removals}
+      on:select:attached={onSelectAttached}
+      on:select:existed={onSelectExisted}
+    />
   </div>
 
   <ProcessButton loading={loading}>
@@ -134,3 +172,7 @@
 
   <Link to={cancelUri} class="btn btn-info btn-block">Cancel</Link>
 </form>
+
+{#if editingSrc}
+  <PlacemarksEditor src={editingSrc} bind:placemarks={editingPlacemarks} on:close={onCloseClick} />
+{/if}

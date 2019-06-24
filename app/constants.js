@@ -11,6 +11,8 @@ export const HTTP_STATUS_VALIDATION_ERROR = 422;
 export const PREVIEW_MAX_SIZE = 500;
 export const IMAGE_MAX_SIZE = 1280; // valid value for safari browser
 
+export const MAX_PLACEMARK_TITLE_LENGTH = 255;
+
 export const URI_DEFAULT = '/';
 export const URI_REGISTER = '/register';
 export const URI_LOGIN = '/login';
