@@ -1,3 +1,13 @@
+<script context="module">
+  let uniqueIndex = 0;
+
+  function getUniqueAttachedId() {
+    const id = `attached-${uniqueIndex}`;
+    uniqueIndex++;
+    return id;
+  }
+</script>
+
 <script>
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import uri from './../instances/uri';
@@ -8,9 +18,7 @@
 
   export let id = '';
 
-  export let existed = [];
-  export let attached = [];
-  export let removed = [];
+  export let data = [];
 
   export let previewMaxSize = PREVIEW_MAX_SIZE;
   export let pictureMaxSize = IMAGE_MAX_SIZE;
@@ -19,9 +27,31 @@
 
   const dispatch = createEventDispatcher();
 
-  // previews storage
-  $: existedPreviews = existed.map((item) => uri.absolute(API_URL, URI_API_PICTURE, { id: item.file_id }));
-  $: attachedPreviews = attached.map((item) => item.preview);
+
+  // validate passed data
+  data.forEach((item) => {
+    const { id, preview, content, src, active } = item;
+
+    if (!id) {
+      throw new Error('Unable to generate preview for the item: `id` property is required for every element');
+    }
+
+    if (typeof active !== 'boolean') {
+      throw new Error('Invalid format for `active` flag: should be boolean');
+    }
+
+    if (!preview && !content && !src) {
+      throw new Error('Unable to detect picture preview because of invalid data: `preview`, `content` or `src` property should exists in every item');
+    }
+  });
+
+
+  // generate previews collection
+  $: previews = data.filter((item) => item.active).map((item) => {
+    const { id, preview, content, src, active } = item;
+    return { id, src: preview || content || src };
+  });
+
 
   // capture picture elements
   let videoContainerEl;
@@ -53,43 +83,27 @@
     const content = await resizePictureFromDataUri(dataURI, pictureMaxSize, pictureMaxSize);
 
     // prepend picture
-    const item = { preview, content };
-    attached = [item, ...attached];
+    const id = getUniqueAttachedId();
+    const item = { id, preview, content, active: true };
+    data = [item, ...data];
   }
 
   async function onDetach(e) {
     e.preventDefault();
     e.stopPropagation();
-    const index = parseInt(e.target.dataset.index, 10);
-    attached.splice(index, 1);
-    attached = attached;
+    const { id } = e.target.dataset; // id already is string because passed from dom data attribute
+    const index = data.findIndex((item) => item.id.toString() === id);
+
+    data[index].active = false;
   }
 
-  async function onRemove(e) {
+  async function onSelect(e) {
     e.preventDefault();
     e.stopPropagation();
-    const index = parseInt(e.target.dataset.index, 10);
-    const spliced = existed.splice(index, 1);
-    existed = existed;
-    removed = [...removed, spliced[0]];
-  }
+    const { id } = e.target.dataset; // id already is string because passed from dom data attribute
+    const index = data.findIndex((item) => item.id.toString() === id);
 
-  async function onSelectAttached(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const index = parseInt(e.target.dataset.index, 10);
-    const model = attached[index];
-    const src = model.content;
-    dispatch('select:attached', { index, src, model });
-  }
-
-  async function onSelectExisted(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const index = parseInt(e.target.dataset.index, 10);
-    const model = existed[index];
-    const src = uri.absolute(API_URL, URI_API_PICTURE, { id: model.file_id });
-    dispatch('select:existed', { index, src, model });
+    dispatch('select', { item: data[index] });
   }
 
   async function captureActiveStream() {
@@ -279,15 +293,9 @@
     <span class="oi" data-glyph="camera-slr"></span>
   </div>
 
-  {#each attachedPreviews as src, i}
-    <div class="card pictures__item" style="background-image: url({src});" on:click={onSelectAttached} data-index={i}>
-      <a class="pictures__item__delete" on:click={onDetach} data-index={i}>✕</a>
-    </div>
-  {/each}
-
-  {#each existedPreviews as src, i}
-    <div class="card pictures__item" style="background-image: url({src});" on:click={onSelectExisted} data-index={i}>
-      <a class="pictures__item__delete" on:click={onRemove} data-index={i}>✕</a>
+  {#each previews as { id, src }, i (id)}
+    <div class="card pictures__item" style="background-image: url({src});" on:click={onSelect} data-id={id}>
+      <a class="pictures__item__delete" on:click={onDetach} data-id={id}>✕</a>
     </div>
   {/each}
 </div>

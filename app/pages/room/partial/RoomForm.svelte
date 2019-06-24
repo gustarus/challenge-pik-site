@@ -2,6 +2,7 @@
   import { navigate } from 'svelte-routing';
   import api from './../../../instances/api';
   import uri from './../../../instances/uri';
+  import uniqBy from 'lodash/uniqBy';
   import handleApiError from './../../../helpers/handleApiError';
   import Link from './../../../components/Link.svelte';
   import notify from './../../../instances/notify';
@@ -38,6 +39,45 @@
 
   export let pictures = [];
 
+  export let placemarks = [];
+
+
+  let picturesData = [];
+  $: {
+    // drop all pictures with models - we should replace them with new prop data
+    const attachedPicturesData = picturesData.filter((item) => !item.model);
+
+    // map received pictures to pictures data
+    const receivedPictures = pictures.map((model) => ({
+      model,
+      id: model.id,
+      active: true,
+      src: uri.absolute(API_URL, URI_API_PICTURE, { id: model.file_id }),
+    }));
+
+    // concat attached pictures with newly received pictures
+    picturesData = [...attachedPicturesData, ...receivedPictures];
+  }
+
+  let placemarksData = [];
+  $: {
+    // drop all placemarks with models - we should replace them with new prop data
+    const attachedPlacemarksData = placemarksData.filter((item) => !item.model);
+
+    // map received placemarks to placemarks data
+    let receivedPlacemarksData = placemarks.map((model) => ({
+      model,
+      id: model.id,
+      active: true,
+      x: model.x,
+      y: model.y,
+      title: model.title,
+    }));
+
+    placemarksData = [...attachedPlacemarksData, ...receivedPlacemarksData];
+  }
+
+
   let attaches = [];
   let removals = [];
 
@@ -46,34 +86,26 @@
     : uri.compile(URI_ROOM_INDEX, { property: property.id });
 
 
-  let editingSrc;
-  let editingIndex;
-  let editingCollection;
-  let editingPlacemarks = [{x:50, y: 50, title: 'Demo title'}];
+  let editingItem;
+  let editingPlacemarks = [];
+  async function onSelect(e) {
+    const { id } = e.detail.item;
 
-  async function onSelectAttached(e) {
-    const { index, src, model } = e.detail;
-    editingPlacemarks = model.placemarks;
-    editingCollection = attaches;
-    editingIndex = index;
-    editingSrc = src;
-  }
+    // pass editing item
+    editingItem = e.detail.item;
 
-  async function onSelectExisted(e) {
-    const { index, src, model } = e.detail;
-    editingPlacemarks = model.placemarks;
-    editingCollection = pictures;
-    editingIndex = index;
-    editingSrc = src;
+    // search for picture placemarks
+    const existedPlacemarks = placemarksData.filter((placemark) => placemark.property_room_picture_id === id);
+    const updatedPlacemarks = placemarksForPictures[id];
+    const picturePlacemarks = [...existedPlacemarks, ...updatedPlacemarks];
+    editingPlacemarks = uniqBy(picturePlacemarks, 'id');
   }
 
   async function onCloseClick(e) {
-    editingCollection[editingIndex] = { ...editingCollection[editingIndex], placemarks: editingPlacemarks };
+    placemarksForPictures[editingItem.id] = editingPlacemarks;
 
+    editingItem = null;
     editingPlacemarks = [];
-    editingCollection = null;
-    editingIndex = null;
-    editingSrc = null;
   }
 
 
@@ -155,11 +187,8 @@
   <div class="form-group">
     <label for="pictures">Room pictures</label>
     <PicturesInput
-      bind:existed={pictures}
-      bind:attached={attaches}
-      bind:removed={removals}
-      on:select:attached={onSelectAttached}
-      on:select:existed={onSelectExisted}
+      bind:data={picturesData}
+      on:select={onSelect}
     />
   </div>
 
@@ -174,6 +203,10 @@
   <Link to={cancelUri} class="btn btn-info btn-block">Cancel</Link>
 </form>
 
-{#if editingSrc}
-  <PlacemarksEditor src={editingSrc} bind:placemarks={editingPlacemarks} on:close={onCloseClick} />
+{#if editingItem}
+  <PlacemarksEditor
+    src={editingItem.preview || editingItem.content || editingItem.src}
+    bind:placemarks={editingPlacemarks}
+    on:close={onCloseClick}
+  />
 {/if}

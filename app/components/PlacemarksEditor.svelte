@@ -1,3 +1,13 @@
+<script context="module">
+  let uniqueIndex = 0;
+
+  function getUniquePlacemarkId() {
+    const id = `placemark-${uniqueIndex}`;
+    uniqueIndex++;
+    return id;
+  }
+</script>
+
 <script>
   import { createEventDispatcher } from 'svelte';
   import { MAX_PLACEMARK_TITLE_LENGTH } from './../constants';
@@ -7,10 +17,32 @@
   export let placemarks = [];
 
 
+  // validate passed data
+  placemarks.forEach((placemark) => {
+    const { id, x, y, title, active } = placemark;
+    if (!id) {
+      throw new Error('Placemark `id` is required for every item');
+    }
+
+    if (!x || !y) {
+      throw new Error(`Coordinates in percents (\`z\` and \`y\`) are required for item with id = \`${id}\``);
+    }
+
+    if (!title) {
+      throw new Error(`Title (\`title\`) is required for item with id = \`${id}\``);
+    }
+
+    if (typeof active !== 'boolean') {
+      throw new Error(`Property \`active\` is required and should be boolean for id = \`${id}\``);
+    }
+  });
+
+
   const dispatch = createEventDispatcher();
 
 
-  let picture;
+  let pictureEl;
+
 
   async function getTitle(label, initial = '') {
     const title = prompt(label, initial);
@@ -30,15 +62,16 @@
     e.preventDefault();
     e.stopPropagation();
 
-    const rect = picture.getBoundingClientRect();
-    const x = (e.x - rect.left) / (picture.clientWidth / 100);
-    const y = (e.y - rect.top) / (picture.clientHeight / 100);
+    const rect = pictureEl.getBoundingClientRect();
+    const x = (e.x - rect.left) / (pictureEl.clientWidth / 100);
+    const y = (e.y - rect.top) / (pictureEl.clientHeight / 100);
     const title = await getTitle('Please enter title for the placemark');
     if (!title) {
       return;
     }
 
-    placemarks = [...placemarks, { x, y, title }];
+    const id = getUniquePlacemarkId();
+    placemarks = [...placemarks, { id, x, y, title, active: true }];
   }
 
   async function onClickUpdate(e) {
@@ -47,8 +80,7 @@
     const index = parseInt(e.target.dataset.index);
     const title = await getTitle('Enter new title or clean up the field to delete the placemark', placemarks[index].title);
     if (title === '') {
-      placemarks.splice(index, 1);
-      placemarks = placemarks;
+      placemarks[index].active = false;
     } else if (typeof title === 'string') {
       placemarks[index] = { ...placemarks[index], title };
     }
@@ -143,12 +175,14 @@
 <div class="component">
   <div class="component__overlay" style="background-image: url('{src}');" />
   <div class="component__content">
-    <img src="{src}" class="component__picture" on:click={onClickCreate} bind:this={picture} />
+    <img src="{src}" class="component__picture" on:click={onClickCreate} bind:this={pictureEl} />
 
-    {#each placemarks as { x, y, title}, i}
-      <div class="component__placemark" style="top: {y}%; left: {x}%;" on:click={onClickUpdate} data-index={i}>
-        <div class="component__placemark__content">{title}</div>
-      </div>
+    {#each placemarks as { id, x, y, title, active}, i (id)}
+      {#if active}
+        <div class="component__placemark" style="top: {y}%; left: {x}%;" on:click={onClickUpdate} data-id={id}>
+          <div class="component__placemark__content">{title}</div>
+        </div>
+      {/if}
     {/each}
   </div>
 
