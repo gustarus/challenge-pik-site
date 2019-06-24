@@ -152,5 +152,5 @@
     {/each}
   </div>
 
-  <span class="component__close" on:click={onCloseClick}>✕</span>
+  <span class="component__close" on:click={onClickClose}>✕</span>
 </div>

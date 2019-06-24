@@ -78,16 +78,18 @@
     e.preventDefault();
     e.stopPropagation();
     const index = parseInt(e.target.dataset.index, 10);
-    const src = attached[index].content;
-    dispatch('select:attached', { index, src });
+    const model = attached[index];
+    const src = model.content;
+    dispatch('select:attached', { index, src, model });
   }
 
   async function onSelectExisted(e) {
     e.preventDefault();
     e.stopPropagation();
     const index = parseInt(e.target.dataset.index, 10);
-    const src = uri.absolute(API_URL, URI_API_PICTURE, { id: existed[index].file_id });
-    dispatch('select:existed', { index, src });
+    const model = existed[index];
+    const src = uri.absolute(API_URL, URI_API_PICTURE, { id: model.file_id });
+    dispatch('select:existed', { index, src, model });
   }
 
   async function captureActiveStream() {

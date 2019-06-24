@@ -52,21 +52,23 @@
   let editingPlacemarks = [{x:50, y: 50, title: 'Demo title'}];
 
   async function onSelectAttached(e) {
-    const { index, src } = e.detail;
+    const { index, src, model } = e.detail;
+    editingPlacemarks = model.placemarks;
     editingCollection = attaches;
     editingIndex = index;
     editingSrc = src;
   }
 
   async function onSelectExisted(e) {
-    const { index, src } = e.detail;
+    const { index, src, model } = e.detail;
+    editingPlacemarks = model.placemarks;
     editingCollection = pictures;
     editingIndex = index;
     editingSrc = src;
   }
 
   async function onCloseClick(e) {
-    editingCollection[editingIndex]
+    editingCollection[editingIndex] = { ...editingCollection[editingIndex], placemarks: editingPlacemarks };
 
     editingPlacemarks = [];
     editingCollection = null;
