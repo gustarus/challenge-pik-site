@@ -53,7 +53,6 @@
 
   async function onSelectAttached(e) {
     const { index, src } = e.detail;
-    editingElement = attaches[index];
     editingCollection = attaches;
     editingIndex = index;
     editingSrc = src;
