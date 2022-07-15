@@ -14,7 +14,7 @@
     "path": "^0.12.7",
     "serve": "^11.0.0",
     "style-loader": "^0.23.1",
-    "svelte": "^3.0.0",
+    "svelte": "^3.49.0",
     "svelte-loader": "2.13.3",
     "svelte-preprocess-css-global": "0.0.1",
     "terser-webpack-plugin": "^1.3.0",
